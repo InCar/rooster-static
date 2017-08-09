@@ -1,4 +1,6 @@
 # rooster-static
+[![Build Status](https://travis-ci.org/InCar/rooster-static.svg?branch=master)](https://travis-ci.org/InCar/rooster-static)
+
 前端静态资源
 
 ## 安装依赖项
@@ -25,15 +27,23 @@ gulp
 ```
 
 ## 配置
-在项目的根目录里可以放置一个`simple-host.json`的配置文件可以配置，内容如下
+1. 在项目的根目录里可以放置一个`simple-host.json`的配置文件可以配置，内容如下
 ```json
 { "port": 80 }
 ```
+2. 在本机的`hosts`文件里配置一个`incarcloud.com`的子域名指向本机比如:
+```
+127.0.0.1    foo.incarcloud.com
+::1          foo.incarcloud.com
+```
+
 
 ## 启动
 ```
 npm run start
 ```
+
+然后用浏览器访问你配置的域名和端口比如`http://foo.incarcloud.com:8080`
 
 ## 调试
 设置`localStorage`的`debug`变量为`true`开启调试模式
