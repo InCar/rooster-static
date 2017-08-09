@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="favicon.ico">
+    <title>英卡车云</title>
+    
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <div id="rootLayout">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/" v-text="title">英卡车云</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/"><span class="glyphicon glyphicon-home"></span> <span v-text="home">首页</span></a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-link"></span> <span v-text="links">链接</span> <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/demo" data-toggle="tooltip" v-text="demo">示范功能</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li class="dropdown-header" v-text="offical">官方网站</li>
+                                <li><a href="http://www.incarcloud.com" target="_blank" data-toggle="tooltip" v-bind:title="offical" v-text="incar">英卡科技</a></li>
+                                <li><a href="http://www.szsoling.com" target="_blank" data-toggle="tooltip" v-bind:title="offical" v-text="soling">索菱股份</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-globe"></span> <span v-text="lang">中文</span> <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li v-for="(value, key) in languages">
+                                    <a href="javascript:void(0)" @click="setLang(key)">{{value}}</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="/about"><span class="glyphicon glyphicon-info-sign"></span> <span v-text="about">关于</span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div v-bind:is="mount" v-bind:stack="stack"></div>
+    </div>
+    <script data-main="/js/config.js" src="//cdn.jsdelivr.net/requirejs/2.1.22/require.min.js"></script>
+</body>
+</html>

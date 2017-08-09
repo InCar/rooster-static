@@ -1,0 +1,20 @@
+# IDE
+.vs
+.vscode
+*.njsproj
+*.sln
+
+# user config
+simple-host.json
+
+# NPM
+node_modules/
+
+# Generated
+src/lib/
+src/css/**/*.css
+src/css/**/*.css.map
+src/js/**/*.js
+src/js/**/*.js.map
+
+obj/

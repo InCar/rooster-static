@@ -1,0 +1,183 @@
+import "bootstrap";
+import "cookie";
+import * as $ from "jquery";
+import * as Modernizr from "modernizr";
+import * as Vue from "vue";
+
+export class App{
+    private _rootElement = "#rootLayout";
+    protected _vueRoot: Vue;
+    
+
+    public App(){}
+
+    public run() {
+        // lang
+        var lang = "text!/index-" + App.lang() + ".json";
+
+         // 对于不支持promise的平台,填充bluebird
+        if (!Modernizr.promises) {
+            requirejs(["bluebird", lang], (Promise, txt) => {
+                window['Promise'] = Promise;
+                this.startApp(txt);
+            });
+        }
+        else {
+            // 启动
+            requirejs([lang], (txt) => {
+                this.startApp(txt);
+            });
+        }
+    }
+
+    private startApp = (txt: string) => {
+        var data = {
+            mount: "home",
+            stack: []
+        };
+
+        // boostrap的navbar在小屏上的点击菜单后,直接隐匿菜单效果
+        this.patchNavBar();
+        // 使得站内的Anchor不刷新页面
+        this.patchAnchor();
+        // 国际化
+        data = this.patchLangJson(data, txt);
+
+        this._vueRoot = new Vue({
+            data,
+            methods: {
+                setLang: (lang) => {
+                    $.cookie("lang", lang);
+                    window.location.reload();
+                }
+            },
+            components: {
+                'home': App.AsyncComp("home/home"),
+                'about': App.AsyncComp("about/about"),
+                'demo': App.AsyncComp("demo/demo")
+            }
+        });
+
+        // mount vue
+        this._vueRoot.$mount(this._rootElement);
+
+        // switch components according location
+        this.switch();
+    };
+
+    private switch() {
+        var stack = window.location.pathname.split("/");
+        stack.shift();
+
+        // resolve mount
+        if (stack.length > 0 && stack[0] && stack[0].length > 0) {
+            this._vueRoot['mount'] = stack[0];
+        }
+        else {
+            // default to home
+            this._vueRoot['mount'] = 'home';
+        }
+
+        // resolve stack
+        stack.shift();
+        this._vueRoot['stack'] = stack;
+    }
+
+    private patchAnchor() {
+        const xthis = this;
+        const evClick: any = "click";
+        $(document).on(evClick, "a", function (e: Event) {
+            // https://stackoverflow.com/questions/736513/how-do-i-parse-a-url-into-hostname-and-path-in-javascript
+            var anchor = document.createElement('a');
+            anchor['href'] = location.href;
+
+            if (anchor['origin'] == this['origin']) { // 是一个站内Anchor
+                e.preventDefault();
+                if (anchor['pathname'] != this['pathname'] || anchor['search'] != this['search']) {
+                    window.history.pushState(null, null, this['href']);
+                    xthis.switch();
+                }
+            }
+        });
+    }
+
+    private patchNavBar() {
+        $("#navbar li:not(.dropdown)>router-link").attr("data-target", "#navbar.in");
+        $("#navbar li:not(.dropdown)>router-link").attr("data-toggle", "collapse");
+    }
+
+    private patchLangJson(data, txt:string) {
+        var jsonTxt = JSON.parse(txt);
+        document.title = jsonTxt["title"];
+        for (var k in jsonTxt) {
+            if (!data[k]) data[k] = jsonTxt[k];
+        }
+
+        data.languages = {
+            "zh": "中文",
+            "en": "English"
+        };
+
+        data.lang = data.languages[App.lang()];
+
+        return data;
+    }
+
+    public static lang() {
+        // 所有支持的语言
+        const languages = ["zh", "en"];
+
+        var lang = null;
+
+        // 优先从cookie中取值
+        lang = $.cookie("lang");
+        if (lang) {
+            if ($.inArray(lang, languages) >= 0) return lang;
+        }
+
+        // 再从浏览器中取值
+        if (navigator["languages"]) {
+            $.each(navigator["languages"], (k, v) => {
+                if ($.inArray(v, languages) >= 0) {
+                    lang = v;
+                    return false;
+                }
+            });
+        }
+        if (lang) return lang;
+
+        // IE9
+        lang = navigator.language || navigator["userLanguage"];
+        if ($.inArray(lang, languages) >= 0) return lang;
+
+        // 最后的缺省值
+        if (!lang) lang = languages[0];
+
+        return lang;
+    }
+
+    public static getQuery(name:string, url?:string) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    public static extends(d, b) {
+        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
+
+    public static AsyncComp(comp: string, args?) {
+        return (resolve, reject) => {
+            requirejs([comp], (factoryComp) => {
+                var obj = new factoryComp(args);
+                obj.init(resolve, reject);
+            });
+        }
+    }
+}
