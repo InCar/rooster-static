@@ -1,0 +1,19 @@
+﻿language: node_js
+
+node_js:
+    - "6"
+
+branches:
+    only:
+        - master
+
+cache:
+    directories:
+        - "node_modules"
+        - $HOME/.nvm
+
+before_script:
+  - npm install -g gulp-cli
+
+script:
+    - gulp
