@@ -5,6 +5,10 @@ import * as Modernizr from "modernizr";
 import * as Vue from "vue";
 
 export class App{
+    private static s_cfg: any = {
+        "api": "http://api.incarcloud.com"
+    };
+
     private _rootElement = "#rootLayout";
     protected _vueRoot: Vue;
     
@@ -40,6 +44,8 @@ export class App{
         this.patchNavBar();
         // 使得站内的Anchor不刷新页面
         this.patchAnchor();
+        // 开发环境配置
+        this.patchDev();
         // 国际化
         data = this.patchLangJson(data, txt);
 
@@ -54,7 +60,8 @@ export class App{
             components: {
                 'home': App.AsyncComp("home/home"),
                 'about': App.AsyncComp("about/about"),
-                'demo': App.AsyncComp("demo/demo")
+                'demo': App.AsyncComp("demo/demo"),
+                '3rd': App.AsyncComp("3rd/3rd")
             }
         });
 
@@ -104,6 +111,16 @@ export class App{
     private patchNavBar() {
         $("#navbar li:not(.dropdown)>router-link").attr("data-target", "#navbar.in");
         $("#navbar li:not(.dropdown)>router-link").attr("data-toggle", "collapse");
+    }
+
+    private patchDev() {
+        // 开发环境中的配置项
+        requirejs(['app-dev'], (cfgDev) => {
+            App.s_cfg = cfgDev;
+            if (cfgDev.alipay) {
+                $('#alipay').attr("href", cfgDev.alipay);
+            }
+        });
     }
 
     private patchLangJson(data, txt:string) {
@@ -165,6 +182,8 @@ export class App{
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
+
+    public static getCfg() { return App.s_cfg; }
 
     public static extends(d, b) {
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];

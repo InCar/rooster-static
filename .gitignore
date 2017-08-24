@@ -6,6 +6,7 @@
 
 # user config
 simple-host.json
+src/js/app-dev.ts
 
 # NPM
 node_modules/
