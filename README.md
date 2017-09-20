@@ -31,11 +31,15 @@ gulp
 ```json
 { "port": 80 }
 ```
-2. 在本机的`hosts`文件里配置一个`incarcloud.com`的子域名指向本机比如:
+
+2. 【可选】把`src/js/app-dev-sample.ts`拷贝成`src/js/app-dev.ts`，修改其中的内容以适合你自己开发环境配置。
+
+3. 【可选】在本机的`hosts`文件里配置一个`incarcloud.com`的子域名指向本机比如:
 ```
 127.0.0.1    foo.incarcloud.com
 ::1          foo.incarcloud.com
 ```
+这样在本机调试时可以访问http://foo.incarcloud.com，以启用cdn加载公共js
 
 
 ## 启动

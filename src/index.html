@@ -37,8 +37,8 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a id="alipay" href="https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2017082308339575&scope=auth_user&redirect_uri=http%3a%2f%2fwww.incarcloud.com/3rd/alipay&state=incarcloud"><img src="/img/alipay.png" /></a></li>
-                        <li><a href="javascript:void(0)"><img src="//qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/Connect_logo_7.png" /></a></li>
+                        <li v-if="isLogin"><img v-bind:src="user.headUrl" style="padding:5px 0" v-bind:title="user.Nick"/></li>
+                        <li v-if="!isLogin"><a id="qq" href="https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101419871&redirect_uri=http%3a%2f%2fapi.incarcloud.com%2f3rd%2fqq&state=%7b&quot;url&quot;%3a&quot;http%3a//local.incarcloud.com/3rd/qq&quot;%7d"><img src="//qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/Connect_logo_7.png" /></a></li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-globe"></span> <span v-text="lang">中文</span> <span class="caret"></span></a>
                             <ul class="dropdown-menu">
@@ -53,7 +53,7 @@
             </div>
         </nav>
 
-        <div v-bind:is="mount" v-bind:stack="stack"></div>
+        <div v-bind:is="mount" v-bind:stack="stack" v-on:login="onLogin"></div>
     </div>
     <script data-main="/js/config.js" src="//cdn.incarcloud.com/lib/requirejs/2.3.4/require.min.js"></script>
 </body>

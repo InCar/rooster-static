@@ -3,6 +3,7 @@ import "cookie";
 import * as $ from "jquery";
 import * as Modernizr from "modernizr";
 import * as Vue from "vue";
+import { User } from "./api/user";
 
 export class App{
     private static s_cfg: any = {
@@ -23,13 +24,17 @@ export class App{
         if (!Modernizr.promises) {
             requirejs(["bluebird", lang], (Promise, txt) => {
                 window['Promise'] = Promise;
-                this.startApp(txt);
+                this.patchDev().then(() => {
+                    this.startApp(txt);
+                });
             });
         }
         else {
             // 启动
             requirejs([lang], (txt) => {
-                this.startApp(txt);
+                this.patchDev().then(() => {
+                    this.startApp(txt);
+                });
             });
         }
     }
@@ -37,15 +42,14 @@ export class App{
     private startApp = (txt: string) => {
         var data = {
             mount: "home",
-            stack: []
+            stack: [],
+            user: {}
         };
 
         // boostrap的navbar在小屏上的点击菜单后,直接隐匿菜单效果
         this.patchNavBar();
         // 使得站内的Anchor不刷新页面
         this.patchAnchor();
-        // 开发环境配置
-        this.patchDev();
         // 国际化
         data = this.patchLangJson(data, txt);
 
@@ -55,6 +59,17 @@ export class App{
                 setLang: (lang) => {
                     $.cookie("lang", lang);
                     window.location.reload();
+                },
+                onLogin: function(user){
+                    this['user'] = Object.assign({}, this['user'], user);
+                    $.cookie("token", `${user.Id}${user.token}`, { path: '/' });
+                }
+            },
+            computed: {
+                isLogin: function () {
+                    // 用user.Id来判断是否已经处于登录状态
+                    if (this['user'].Id) return true;
+                    else return false;
                 }
             },
             components: {
@@ -62,6 +77,25 @@ export class App{
                 'about': App.AsyncComp("about/about"),
                 'demo': App.AsyncComp("demo/demo"),
                 '3rd': App.AsyncComp("3rd/3rd")
+            },
+            mounted: function () {
+                var vthis:any = this;
+                // check cookie token for user
+                var token = $.cookie("token");
+                if (token) {
+                    var usr = new User();
+                    usr.findUserByToken(token).then((user) => {
+                        if (user) {
+                            // token有效
+                            vthis.user = Object.assign({}, vthis.user, user);
+                        }
+                        else {
+                            // token无效
+                            $.removeCookie("token")
+                        }
+                    })
+                }
+                
             }
         });
 
@@ -115,11 +149,17 @@ export class App{
 
     private patchDev() {
         // 开发环境中的配置项
-        requirejs(['app-dev'], (cfgDev) => {
-            App.s_cfg = cfgDev;
-            if (cfgDev.alipay) {
-                $('#alipay').attr("href", cfgDev.alipay);
-            }
+        return new Promise((resolve) => {
+            requirejs(['app-dev'], (cfgDev) => {
+                App.s_cfg = cfgDev;
+                if (cfgDev.alipay) {
+                    $('#alipay').attr("href", cfgDev.alipay);
+                }
+                resolve(0);
+            }, () => {
+                // 配置项是可选的,如果没有,也继续执行
+                resolve(-1);
+            });
         });
     }
 
