@@ -39,7 +39,7 @@ export class User {
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
                 token
-            }
+            })
         });
     }
 }

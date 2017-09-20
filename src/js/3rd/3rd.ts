@@ -2,7 +2,7 @@
 import { App } from "../app";
 import { User } from "../api/user";
 
-export = class Home {
+export = class Third {
     constructor() {
     }
 
@@ -20,6 +20,19 @@ export = class Home {
                         var usr = new User();
                         if (this.stack[0] == "qq") {
                             // QQ 登录
+                            var state = JSON.parse(new URL(window.location.toString()).searchParams.get("state"));
+                            if (state && state.url) {
+                                // 请求来自于开发人员的测试机器,重定向到开发人员指定的url
+                                var target = new URL(state.url);
+                                if (window.location.origin != target.origin) {
+                                    // do jump
+                                    var jump = target.origin + target.pathname + window.location.search;
+                                    window.location.href = jump;
+                                    return;
+                                }
+                            }
+
+                            // 处理QQ登录
                             var code = (new URL(window.location.toString())).searchParams.get("code");
                             usr.loginFromQQ(code).then((user) => {
                                 // 触发一个登录事件
@@ -36,4 +49,6 @@ export = class Home {
             });
         });
     }
+
+    private is
 };

@@ -6,10 +6,6 @@ import * as Vue from "vue";
 import { User } from "./api/user";
 
 export class App{
-    private static s_cfg: any = {
-        "api": "http://api.incarcloud.com"
-    };
-
     private _rootElement = "#rootLayout";
     protected _vueRoot: Vue;
     
@@ -24,17 +20,13 @@ export class App{
         if (!Modernizr.promises) {
             requirejs(["bluebird", lang], (Promise, txt) => {
                 window['Promise'] = Promise;
-                this.patchDev().then(() => {
-                    this.startApp(txt);
-                });
+                this.startApp(txt);
             });
         }
         else {
             // 启动
             requirejs([lang], (txt) => {
-                this.patchDev().then(() => {
-                    this.startApp(txt);
-                });
+                this.startApp(txt);
             });
         }
     }
@@ -146,23 +138,7 @@ export class App{
         $("#navbar li:not(.dropdown)>router-link").attr("data-target", "#navbar.in");
         $("#navbar li:not(.dropdown)>router-link").attr("data-toggle", "collapse");
     }
-
-    private patchDev() {
-        // 开发环境中的配置项
-        return new Promise((resolve) => {
-            requirejs(['app-dev'], (cfgDev) => {
-                App.s_cfg = cfgDev;
-                if (cfgDev.alipay) {
-                    $('#alipay').attr("href", cfgDev.alipay);
-                }
-                resolve(0);
-            }, () => {
-                // 配置项是可选的,如果没有,也继续执行
-                resolve(-1);
-            });
-        });
-    }
-
+    
     private patchLangJson(data, txt:string) {
         var jsonTxt = JSON.parse(txt);
         document.title = jsonTxt["title"];
@@ -223,7 +199,7 @@ export class App{
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    public static getCfg() { return App.s_cfg; }
+    public static getCfg() { return window["settings"]; }
 
     public static extends(d, b) {
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
