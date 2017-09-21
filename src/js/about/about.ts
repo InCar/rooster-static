@@ -3,10 +3,15 @@ import * as $ from "jquery";
 import { App } from "../app";
 
 export = class Home {
+    private _base: string;
+
     constructor() {
+        this._base = App.getCfg()['api'];
     }
 
     public init(resolve, reject) {
+        var vthis = this;
+
         requirejs(['text!about/about.html', `text!about/about-${App.lang()}.json`], (template, txt) => {
             const lang = JSON.parse(txt);
 
@@ -26,7 +31,7 @@ export = class Home {
                 mounted: function () {
                     var fnGetValue : any = {
                         method: "GET",
-                        url: "http://local.incarcloud.com:8000/api/SandBox/hello-world/get-value/9853/org/405",
+                        url: `${vthis._base}/api/SandBox/hello-world/get-value/9853/org/405`,
                         headers: {
                             "x-hub-from_app": 9853
                         }

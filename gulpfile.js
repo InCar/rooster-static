@@ -9,6 +9,7 @@ var gulp = require("gulp"),
     less = require("gulp-less"),
     cssmin = require("gulp-cssmin"),
     rename = require("gulp-rename"),
+    replace = require('gulp-replace'),
     ts = require("gulp-typescript"),
     modernizr = require("gulp-modernizr"),
     debug = require("gulp-debug"),
@@ -17,7 +18,8 @@ var gulp = require("gulp"),
     del = require("del"),
     fs = require("fs"),
     chalk = require("chalk"),
-    Promise = require("promise");
+    Promise = require("promise"),
+    GitVersionJson = require('git-version-json');
 
 var paths = {
     webroot: "./src/"
@@ -59,6 +61,12 @@ gulp.task('clean-ts', (cb) => {
     return del([
         path.join(paths.webroot, "js/**/*.js"),
         path.join(paths.webroot, "js/**/*.js.map")]);
+});
+
+gulp.task('mark-version', [GitVersionJson.task, 'ts'], ()=>{
+    return gulp.src('src/js/app.js')
+        .pipe(replace('\"MARK_GIT_VERSION\"', JSON.stringify(GitVersionJson.gitVer)))
+        .pipe(gulp.dest('src/js'));
 });
 
 // modernizr
@@ -179,6 +187,6 @@ gulp.task('i18n-check', (cb) => {
 });
 
 // default
-gulp.task("build", ["less", "ts", "modernizr", "lib", "i18n-check"]);
+gulp.task("build", ["less", "ts", "modernizr", "lib", "i18n-check", "mark-version"]);
 gulp.task("clean", ["clean-lib", "clean-ts", "clean-less"]);
 gulp.task("default", ["build"]);

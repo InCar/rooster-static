@@ -3,6 +3,7 @@ import "cookie";
 import * as $ from "jquery";
 import * as Modernizr from "modernizr";
 import * as Vue from "vue";
+import { Basic } from "./api/basic";
 import { User } from "./api/user";
 
 export class App{
@@ -33,6 +34,7 @@ export class App{
 
     private startApp = (txt: string) => {
         var data = {
+            version: { front: "MARK_GIT_VERSION", back: {} },
             mount: "home",
             stack: [],
             qq: window['settings'].qq,
@@ -73,6 +75,12 @@ export class App{
             },
             mounted: function () {
                 var vthis:any = this;
+                // check version
+                var bsc = new Basic();
+                bsc.getVersion().then((ver)=>{
+                    Vue.set(vthis.version, "back", ver);
+                });
+
                 // check cookie token for user
                 var token = $.cookie("token");
                 if (token) {
