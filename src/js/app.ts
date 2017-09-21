@@ -35,6 +35,7 @@ export class App{
         var data = {
             mount: "home",
             stack: [],
+            qq: window['settings'].qq,
             user: {}
         };
 
