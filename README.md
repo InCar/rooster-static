@@ -32,22 +32,32 @@ gulp
 { "port": 80 }
 ```
 
-2. 【可选】把`src/js/app-dev-sample.ts`拷贝成`src/js/app-dev.ts`，修改其中的内容以适合你自己开发环境配置。
+2. 使用域名`local.incarcloud.com`来进行本机调试工作
 
-3. 【可选】在本机的`hosts`文件里配置一个`incarcloud.com`的子域名指向本机比如:
-```
-127.0.0.1    foo.incarcloud.com
-::1          foo.incarcloud.com
-```
-这样在本机调试时可以访问http://foo.incarcloud.com，以启用cdn加载公共js
+因为公共js比如(jquery)采用从我们的cdn来加载,出于安全原因
+我们限制cdn只接受来自incarcloud.com内的访问请求
 
+而local.incarcloud.com被解析为127.0.0.1
+
+3. 把`src/js/settings-sample.js`拷贝成`src/js/settings.js`，修改其中的内容以适合你自己开发环境配置。
+
+当在内网进行调试时,由于QQ登录的跳转URL有安全限制,可以利用state参数进行中转跳转
+
+把qq登录链接设置为如下值
+```
+https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101419871&redirect_uri=http%3a%2f%2fmy.incarcloud.com%2f3rd%2fqq&state=%7b%22url%22%3a%22http%3a%2f%2flocal.incarcloud.com%2f3rd%2fqq%22%7d
+```
+这里关键点在于把`redirect_uri`设置为QQ登录允许的公网URL`http://my.incarcloud.com/3rd/qq`
+这样会在QQ登录成功后,会跳转到公网页面上,
+这个页面会检测state里的url参数,如果这个参数存在,那么会在浏览器里再进行一次跳转.
+这个url可以指定一个内网地址
 
 ## 启动
 ```
 npm run start
 ```
 
-然后用浏览器访问你配置的域名和端口比如`http://foo.incarcloud.com:8080`
+然后用浏览器访问你配置的域名和端口比如`http://local.incarcloud.com:80`
 
 ## 调试
 设置`localStorage`的`debug`变量为`true`开启调试模式
