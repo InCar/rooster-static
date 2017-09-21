@@ -58,6 +58,16 @@ export class App{
                 onLogin: function(user){
                     this['user'] = Object.assign({}, this['user'], user);
                     $.cookie("token", `${user.Id}${user.token}`, { path: '/' });
+                },
+                logout: function(){
+                    // 注销
+                    var token = $.cookie("token");
+                    if(token){
+                        var usr = new User();
+                        usr.logout(token);
+                    }
+                    $.removeCookie("token");
+                    Vue.set(this['user'], "Id", "");
                 }
             },
             computed: {

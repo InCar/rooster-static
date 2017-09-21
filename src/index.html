@@ -48,6 +48,7 @@
                             </ul>
                         </li>
                         <li><a href="/about"><span class="glyphicon glyphicon-info-sign"></span> <span v-text="about">关于</span></a></li>
+                        <li v-if="isLogin"><a href="javascript:void(0)" @click="logout()"><span class="glyphicon glyphicon-log-out"></span></a></li>
                     </ul>
                 </div>
             </div>

@@ -42,4 +42,15 @@ export class User {
             })
         });
     }
+
+    public logout(token: string){
+        return $.ajax({
+            url: `${this._base}/portal/user/logout`,
+            method: 'POST',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                token
+            })
+        });
+    }
 }
