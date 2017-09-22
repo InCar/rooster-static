@@ -158,8 +158,8 @@ export class App{
     }
 
     private patchNavBar() {
-        $("#navbar li:not(.dropdown)>router-link").attr("data-target", "#navbar.in");
-        $("#navbar li:not(.dropdown)>router-link").attr("data-toggle", "collapse");
+        $("#navbar li:not(.dropdown)>a").attr("data-target", "#navbar.in");
+        $("#navbar li:not(.dropdown)>a").attr("data-toggle", "collapse");
     }
     
     private patchLangJson(data, txt:string) {
@@ -183,33 +183,33 @@ export class App{
         // 所有支持的语言
         const languages = ["zh", "en"];
 
-        var lang = null;
+        var lan = null;
 
         // 优先从cookie中取值
-        lang = $.cookie("lang");
-        if (lang) {
-            if ($.inArray(lang, languages) >= 0) return lang;
+        lan = $.cookie("lang");
+        if (lan) {
+            if ($.inArray(lan, languages) >= 0) return lan;
         }
 
         // 再从浏览器中取值
         if (navigator["languages"]) {
             $.each(navigator["languages"], (k, v) => {
                 if ($.inArray(v, languages) >= 0) {
-                    lang = v;
+                    lan = v;
                     return false;
                 }
             });
         }
-        if (lang) return lang;
+        if (lan) {
+            if ($.inArray(lan, languages) >= 0) return lan;
+        }
 
         // IE9
-        lang = navigator.language || navigator["userLanguage"];
-        if ($.inArray(lang, languages) >= 0) return lang;
+        lan = navigator.language || navigator["userLanguage"];
+        if ($.inArray(lan, languages) >= 0) return lan;
 
         // 最后的缺省值
-        if (!lang) lang = languages[0];
-
-        return lang;
+        return languages[0];
     }
 
     public static getQuery(name:string, url?:string) {

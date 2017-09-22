@@ -22,8 +22,8 @@ class Config{
         })
     }
 
-    public start(){
-        requirejs(['app'], (AppModule)=>{
+    public start() {
+        requirejs(['app'], (AppModule) => {
             let app = new AppModule.App();
             window['app'] = app;
             app.run();
@@ -59,7 +59,7 @@ class Config{
                 text: ["//cdn.incarcloud.com/lib/requirejs.text/2.0.15/text.min", "/lib/requirejs-text/text.min"],
                 jquery: ["//cdn.incarcloud.com/lib/jquery/3.2.1/jquery.min", "/lib/jquery/dist/jquery.min"],
                 cookie: ["//cdn.incarcloud.com/lib/jquery.cookie/1.4.29/jquery.cookie.min", "/lib/jquery.cookie/jquery.cookie.min"],
-                bootstrap: ["//cdn.incarcloud.com/lib/bootstrap/3.3.7/js/bootstrap.min", "/lib/bootstrap/dist/js/bootstrap/bootstrap.min"],
+                bootstrap: ["//cdn.incarcloud.com/lib/bootstrap/3.3.7/js/bootstrap.min", "/lib/bootstrap/dist/js/bootstrap.min"],
                 bluebird: ["//cdn.incarcloud.com/lib/bluebird/3.5.0/bluebird.min", "/lib/bluebird/js/browser/bluebird.min"],
                 vue: ["//cdn.incarcloud.com/lib/vue/2.4.2/vue.min", "/lib/vue/dist/vue.min"]
             };

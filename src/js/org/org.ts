@@ -1,4 +1,5 @@
 import * as Vue from "vue";
+import * as $ from "jquery";
 import { App } from "../app";
 import { OrgAPI } from "../api/orgAPI";
 
@@ -17,25 +18,33 @@ export = class OrgPage {
                 template,
                 data: () => {
                     return {
-                        clickedTimes: 0
+                        listOrgs: [],
+                        newOrgName: ""
                     }
                 },
                 props: ['stack'],
-                computed: {
-                    text: function() {
-                        return `I've been clicked ${this.clickedTimes} times.`;
-                    }
-                },
-                methods: {
-                    OnClickBtn: function() {
-                        this.clickedTimes++;
-                    }
-                },
                 mounted: function () {
+                    var vthis = this;
                     var token = App.getToken();
                     apiOrg.getAllMyOrgs(token).then((data) => {
-                        console.info(data);
+                        data.forEach((o) => {
+                            vthis.listOrgs.push(o);
+                            vthis.listOrgs.push(o);
+                        });
                     });
+                },
+                methods: {
+                    createOrg: function (dlg) {
+                        var vthis = this;
+                        var token = App.getToken();
+                        apiOrg.createOrg(token, this.newOrgName)
+                            .then((o) => {
+                                vthis.listOrgs.push(0);
+                                $(`#${dlg}`)['modal']('hide');
+                            }, (ex) => {
+                                console.error(ex);
+                            });
+                    }
                 }
             });
         });
