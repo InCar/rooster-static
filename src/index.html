@@ -28,11 +28,13 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-link"></span> <span v-text="links">链接</span> <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="/demo" data-toggle="tooltip" v-text="demo">示范功能</a></li>
+                                <li><a href="/org">组织</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li class="dropdown-header" v-text="offical">官方网站</li>
                                 <li><a href="http://www.incarcloud.com" target="_blank" data-toggle="tooltip" v-bind:title="offical" v-text="incar">英卡科技</a></li>
                                 <li><a href="http://www.szsoling.com" target="_blank" data-toggle="tooltip" v-bind:title="offical" v-text="soling">索菱股份</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="/demo" v-text="demo">示例</a></li>
                             </ul>
                         </li>
                     </ul>

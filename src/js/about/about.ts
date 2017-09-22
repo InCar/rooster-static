@@ -2,7 +2,7 @@
 import * as $ from "jquery";
 import { App } from "../app";
 
-export = class Home {
+export = class AboutPage {
     private _base: string;
 
     constructor() {
@@ -16,7 +16,7 @@ export = class Home {
             const lang = JSON.parse(txt);
 
             resolve({
-                name: "About",
+                name: "AboutPage",
                 template,
                 methods: {
                     i18n: function (value) {

@@ -1,23 +1,11 @@
 ﻿import { App } from "../app";
 import * as $ from "jquery";
 
-export class User {
+export class UserAPI {
     private _base: string;
 
     public constructor() {
         this._base = App.getCfg()['api'];
-    }
-
-    public loginFromAliPay(query: string) {
-        $.ajax({
-            url: `${this._base}/api/user/login`,
-            method: 'POST',
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({
-                provider: "alipay",
-                query
-            })
-        });
     }
 
     public loginFromQQ(code: string) {
@@ -29,6 +17,9 @@ export class User {
                 provider: "qq",
                 code
             })
+        }).then((data) => {
+            if (!data) return null;
+            return new UserLogin(data);
         });
     }
 
@@ -40,6 +31,9 @@ export class User {
             data: JSON.stringify({
                 token
             })
+        }).then((data) => {
+            if (!data) return null;
+            return new User(data);
         });
     }
 
@@ -52,5 +46,39 @@ export class User {
                 token
             })
         });
+    }
+}
+
+export class User {
+    public Id: string;
+    public Nick: string;
+    public headUrl: string;
+    public gender: string;
+    public birthYear: string;
+    public city: string;
+    public province: string;
+
+    public constructor(src) {
+        if (src) {
+            this.Id = src.Id;
+            this.Nick = src.Nick;
+            this.headUrl = src.headUrl;
+            this.gender = src.gender;
+            this.birthYear = src.birthYear;
+            this.city = src.city;
+            this.province = src.province;
+        }
+    }
+}
+
+export class UserLogin extends User{
+    public token: string;
+
+    public constructor(src) {
+        super(src);
+
+        if (src) {
+            this.token = src.token;
+        }
     }
 }

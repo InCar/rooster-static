@@ -3,12 +3,15 @@ import "cookie";
 import * as $ from "jquery";
 import * as Modernizr from "modernizr";
 import * as Vue from "vue";
-import { Basic } from "./api/basic";
-import { User } from "./api/user";
+import { BasicAPI } from "./api/basicAPI";
+import { UserAPI } from "./api/userAPI";
 
 export class App{
     private _rootElement = "#rootLayout";
     protected _vueRoot: Vue;
+
+    private _apiBasic = new BasicAPI();
+    private _apiUser = new UserAPI();
     
 
     public App(){}
@@ -33,6 +36,9 @@ export class App{
     }
 
     private startApp = (txt: string) => {
+        var apiBasic = this._apiBasic;
+        var apiUser = this._apiUser;
+
         var data = {
             version: { front: "MARK_GIT_VERSION", back: {} },
             mount: "home",
@@ -62,9 +68,8 @@ export class App{
                 logout: function(){
                     // 注销
                     var token = $.cookie("token");
-                    if(token){
-                        var usr = new User();
-                        usr.logout(token);
+                    if (token) {
+                        apiUser.logout(token);
                     }
                     $.removeCookie("token");
                     Vue.set(this['user'], "Id", "");
@@ -80,22 +85,21 @@ export class App{
             components: {
                 'home': App.AsyncComp("home/home"),
                 'about': App.AsyncComp("about/about"),
+                'org': App.AsyncComp("org/org"),
                 'demo': App.AsyncComp("demo/demo"),
                 '3rd': App.AsyncComp("3rd/3rd")
             },
             mounted: function () {
                 var vthis:any = this;
                 // check version
-                var bsc = new Basic();
-                bsc.getVersion().then((ver)=>{
+                apiBasic.getVersion().then((ver) => {
                     Vue.set(vthis.version, "back", ver);
                 });
 
                 // check cookie token for user
                 var token = $.cookie("token");
                 if (token) {
-                    var usr = new User();
-                    usr.findUserByToken(token).then((user) => {
+                    apiUser.findUserByToken(token).then((user) => {
                         if (user) {
                             // token有效
                             vthis.user = Object.assign({}, vthis.user, user);
@@ -219,6 +223,8 @@ export class App{
     }
 
     public static getCfg() { return window["settings"]; }
+
+    public static getToken() { return $.cookie("token"); }
 
     public static extends(d, b) {
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];

@@ -1,23 +1,26 @@
 ﻿import * as Vue from "vue";
 import { App } from "../app";
-import { User } from "../api/user";
+import { UserAPI } from "../api/userAPI";
 
-export = class Third {
+export = class ThirdPage {
+    private _apiUser = new UserAPI();
+
     constructor() {
     }
 
     public init(resolve, reject) {
+        var apiUser = this._apiUser;
+
         requirejs(['text!3rd/3rd.html'], (template) => {
 
             resolve({
-                name: "Third",
+                name: "ThirdPage",
                 template,
                 props: ["stack"],
                 mounted: function () {
                     if (this.stack && this.stack.length > 0) {
                         var vthis = this;
 
-                        var usr = new User();
                         if (this.stack[0] == "qq") {
                             // QQ 登录
                             var stateTxt = new URL(window.location.toString()).searchParams.get("state");
@@ -38,7 +41,7 @@ export = class Third {
                             // 处理QQ登录
                             var code = (new URL(window.location.toString())).searchParams.get("code");
                             if(code){
-                                usr.loginFromQQ(code).then((user) => {
+                                apiUser.loginFromQQ(code).then((user) => {
                                     // 触发一个登录事件
                                     history.replaceState(null, "QQ登录", "/3rd/qq")
                                     vthis.$emit("login", user);
@@ -47,7 +50,7 @@ export = class Third {
                         }
                         else if (this.stack[0] == "alipay") {
                             // 支付宝登录
-                            usr.loginFromAliPay(window.location.search);
+                            // apiUser.loginFromAliPay(...);
                         }
                     }
                 }

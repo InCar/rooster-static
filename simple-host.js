@@ -24,7 +24,7 @@ app.use(etag());
 app.use(static(path.join(__dirname, 'src')));
 
 app.use(async (ctx, next) => {
-    if (/^\/(about|demo|3rd)\/?/.test(ctx.request.url)) {
+    if (/^\/(org|about|demo|3rd)\/?/.test(ctx.request.url)) {
         await send(ctx, 'index.html', { root: path.join(__dirname, 'src') });
     }
 });
