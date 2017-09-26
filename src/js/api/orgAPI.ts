@@ -36,17 +36,34 @@ export class OrgAPI {
             return new Org(data);
         });
     }
+
+    // É¾³ý×éÖ¯
+    public deleteOrg(token: string, org: Org) {
+        return $.ajax({
+            url: `${this._base}/portal/org/delete`,
+            method: 'POST',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                token,
+                oid: org.id
+            })
+        }).then((data) => {
+            return 0;
+        });
+    }
 }
 
 export class Org {
     public name: string;
     public id: number;
+    public ts: Date;
     public ownerUserId: string;
 
     public constructor(src) {
         if (src) {
             this.name = src.name;
             this.id = src.id;
+            this.ts = new Date(src.ts);
             this.ownerUserId = src.ownerUserId;
         }
     }

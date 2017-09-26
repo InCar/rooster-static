@@ -19,7 +19,8 @@ export = class OrgPage {
                 data: () => {
                     return {
                         listOrgs: [],
-                        newOrgName: ""
+                        newOrgName: "",
+                        deletingOrg: {}
                     }
                 },
                 props: ['stack'],
@@ -28,7 +29,6 @@ export = class OrgPage {
                     var token = App.getToken();
                     apiOrg.getAllMyOrgs(token).then((data) => {
                         data.forEach((o) => {
-                            vthis.listOrgs.push(o);
                             vthis.listOrgs.push(o);
                         });
                     });
@@ -39,7 +39,24 @@ export = class OrgPage {
                         var token = App.getToken();
                         apiOrg.createOrg(token, this.newOrgName)
                             .then((o) => {
-                                vthis.listOrgs.push(0);
+                                vthis.listOrgs.push(o);
+                                vthis.listOrgs.sort((l, r) => { return l.id >= r.id });
+                                $(`#${dlg}`)['modal']('hide');
+                            }, (ex) => {
+                                console.error(ex);
+                            });
+                    },
+                    confirmDelOrg: function (dlg, o) {
+                        this.deletingOrg = o;
+                        $(`#${dlg}`)['modal']('show');
+                    },
+                    deleteOrg: function (dlg, o) {
+                        var vthis = this;
+                        var token = App.getToken();
+                        apiOrg.deleteOrg(token, o)
+                            .then(() => {
+                                var idx = vthis.listOrgs.indexOf(o);
+                                vthis.listOrgs.splice(idx, 1);
                                 $(`#${dlg}`)['modal']('hide');
                             }, (ex) => {
                                 console.error(ex);
