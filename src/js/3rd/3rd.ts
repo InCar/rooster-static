@@ -16,12 +16,12 @@ export = class ThirdPage {
             resolve({
                 name: "ThirdPage",
                 template,
-                props: ["stack"],
+                props: ["rest"],
                 mounted: function () {
-                    if (this.stack && this.stack.length > 0) {
+                    if (this.rest) {
                         var vthis = this;
 
-                        if (this.stack[0] == "qq") {
+                        if (this.rest == "qq") {
                             // QQ 登录
                             var stateTxt = new URL(window.location.toString()).searchParams.get("state");
                             if(stateTxt){
@@ -48,7 +48,7 @@ export = class ThirdPage {
                                 });
                             }
                         }
-                        else if (this.stack[0] == "alipay") {
+                        else if (this.rest == "alipay") {
                             // 支付宝登录
                             // apiUser.loginFromAliPay(...);
                         }

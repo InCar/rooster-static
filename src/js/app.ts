@@ -42,7 +42,8 @@ export class App{
         var data = {
             version: { front: "MARK_GIT_VERSION", back: {} },
             mount: "home",
-            stack: [],
+            rest: "",
+            args: {},
             qq: window['settings'].qq,
             user: {}
         };
@@ -86,6 +87,7 @@ export class App{
                 'home': App.AsyncComp("home/home"),
                 'about': App.AsyncComp("about/about"),
                 'org': App.AsyncComp("org/org"),
+                'org/{oid}/app': App.AsyncComp("org/app"),
                 'demo': App.AsyncComp("demo/demo"),
                 '3rd': App.AsyncComp("3rd/3rd")
             },
@@ -122,23 +124,13 @@ export class App{
     };
 
     private switch() {
-        var stack = window.location.pathname.split("/");
-        stack.shift();
+        // 按最贪心匹配,没匹配的部分成为rest
+        var matched = App.bestMatch(window.location.pathname, Object.keys(this._vueRoot.$options.components));
 
-        // resolve mount
-        if (stack.length > 0 && stack[0] && stack[0].length > 0) {
-            this._vueRoot['mount'] = stack[0];
-        }
-        else {
-            // default to home
-            this._vueRoot['mount'] = 'home';
-        }
-
-        // resolve stack
-        stack.shift();
-        this._vueRoot['stack'] = stack;
+        this._vueRoot['mount'] = matched.key;
+        this._vueRoot['rest'] = matched.rest;
+        this._vueRoot['args'] = matched.args;
     }
-
     private patchAnchor() {
         const xthis = this;
         const evClick: any = "click";
@@ -224,7 +216,64 @@ export class App{
 
     public static getCfg() { return window["settings"]; }
 
-    public static getToken() { return $.cookie("token"); }
+    public static getToken(): string { return $.cookie("token"); }
+
+    public static bestMatch(path, keys) {
+        var segPath = path.split("/");
+        segPath.shift();
+
+        var matchIdx = 0;
+        var matchKey = "home";
+        var args: any = {};
+
+        keys.forEach((key) => {
+            var matched = 0;
+            var argx = {};
+            var segKey = key.split("/");
+
+            if (segKey.length <= segPath.length) {
+                // path可以有剩余部分,而key必须得全部匹配上
+                for (var i = 0; i < segKey.length; i++) {
+                    var k = segKey[i];
+                    if (k.length > 2 && k[0] == "{" && k[k.length - 1] == "}") {
+                        // 参数,匹配度直接增加
+                        argx[k.substring(1, k.length - 1)] = segPath[i];
+                        matched++;
+                    }
+                    else {
+                        if (segPath[i].toUpperCase() == k.toUpperCase()) {
+                            matched++
+                        } else {
+                            matched = 0;
+                            break;
+                        }
+                    }
+                }
+
+                if (matched > matchIdx) {
+                    // 找到了匹配程度更高的
+                    matchIdx = matched;
+                    matchKey = key;
+                    args = argx;
+                }
+            }
+        });
+
+        // 余下的部分
+        var rest = "";
+        if (segPath.length > matchIdx) {
+            rest = segPath.slice(matchIdx).join("/");
+        }
+
+        const m = {
+            key: matchKey,
+            rest,
+            args
+        };
+
+        return m;
+    }
+
 
     public static extends(d, b) {
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
