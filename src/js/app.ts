@@ -64,7 +64,7 @@ export class App{
                 },
                 onLogin: function(user){
                     this['user'] = Object.assign({}, this['user'], user);
-                    $.cookie("token", `${user.Id}${user.token}`, { path: '/' });
+                    $.cookie("token", `${user.id}${user.token}`, { path: '/' });
                 },
                 logout: function(){
                     // 注销
@@ -73,13 +73,13 @@ export class App{
                         apiUser.logout(token);
                     }
                     $.removeCookie("token");
-                    Vue.set(this['user'], "Id", "");
+                    Vue.set(this['user'], "id", "");
                 }
             },
             computed: {
                 isLogin: function () {
-                    // 用user.Id来判断是否已经处于登录状态
-                    if (this['user'].Id) return true;
+                    // 用user.id来判断是否已经处于登录状态
+                    if (this['user'].id) return true;
                     else return false;
                 }
             },
@@ -108,7 +108,7 @@ export class App{
                         }
                         else {
                             // token无效
-                            $.removeCookie("token")
+                            $.removeCookie("token", { path: '/' })
                         }
                     })
                 }
@@ -121,6 +121,9 @@ export class App{
 
         // switch components according location
         this.switch();
+        window.onpopstate = (ev) => {
+            this.switch();
+        };
     };
 
     private switch() {

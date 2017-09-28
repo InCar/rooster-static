@@ -22,6 +22,21 @@ export class OrgAPI {
         });
     }
 
+    // 查询特定组织
+    public getOrg(token: string, oid: number) {
+        return $.ajax({
+            url: `${this._base}/portal/org/single`,
+            method: 'POST',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                token,
+                oid
+            })
+        }).then((data) => {
+            return new Org(data);
+        });
+    }
+
     // 创建组织
     public createOrg(token: string, orgName: string) {
         return $.ajax({
