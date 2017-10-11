@@ -22,7 +22,10 @@ export = class AppPage {
                 data: () => {
                     return {
                         org: { id: 0, name: "loading...", },
-                        newApp: {}
+                        listApps: [],
+                        newApp: {},
+                        deletingApp: {},
+                        deletingAppName: ""
                     }
                 },
                 props: ['rest', 'args'],
@@ -34,17 +37,43 @@ export = class AppPage {
                         vthis.org = o;
                         return o;
                     }).then((o) => {
-                        // TODO: fetch info of app
+                        return apiApp.getApps(token, o.id)
+                    }).then((apps) => {
+                        apps.forEach((app) => { vthis.listApps.push(app); });
                     });
                 },
                 methods: {
-                    createApp: function (dlg, app : XApp) {
+                    createApp: function (dlg, app: XApp) {
+                        var vthis = this;
                         const token = App.getToken();
-                        apiApp.createApp(token, app.name, app.baseUrl).then((data) => {
-                            console.info(data);
-                            console.info(this);
+                        var oid = this.args.oid;
+                        apiApp.createApp(token, oid, app.name, app.baseUrl).then((data) => {
+                            vthis.listApps.push(data);
+                            vthis.listApps.sort((l, r) => { return l.name >= r.name });
+                            $(`#${dlg}`)['modal']('hide');
                         });
-                    }
+                    },
+                    confirmDelApp: function (dlg, app) {
+                        this.deletingApp = app;
+                        this.deletingAppName = "";
+                        $(`#${dlg}`)['modal']('show');
+                    },
+                    deleteApp: function (dlg, app, nameChecking) {
+                        if (app.name != nameChecking) return;
+
+                        var vthis = this;
+                        var token = App.getToken();
+                        var oid = this.args.oid;
+
+                        apiApp.deleteApp(token, oid, app.appId)
+                            .then(() => {
+                                var idx = vthis.listApps.indexOf(app);
+                                vthis.listApps.splice(idx, 1);
+                                $(`#${dlg}`)['modal']('hide');
+                            }, (ex) => {
+                                console.error(ex);
+                            });
+                    },
                 }
             });
         });
