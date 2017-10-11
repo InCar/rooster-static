@@ -15,7 +15,7 @@ export = class DemoPage {
                         clickedTimes: 0
                     }
                 },
-                props: ['stack'],
+                props: ['rest'],
                 computed: {
                     text: function() {
                         return `I've been clicked ${this.clickedTimes} times.`;

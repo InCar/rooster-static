@@ -23,7 +23,7 @@ export = class OrgPage {
                         deletingOrg: {}
                     }
                 },
-                props: ['stack'],
+                props: ['rest'],
                 mounted: function () {
                     var vthis = this;
                     var token = App.getToken();
@@ -61,6 +61,9 @@ export = class OrgPage {
                             }, (ex) => {
                                 console.error(ex);
                             });
+                    },
+                    jump: function (oid: number, target: string) {
+                        document.location.href += `/${oid}/${target}`
                     }
                 }
             });

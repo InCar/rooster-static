@@ -40,7 +40,7 @@ export class UserAPI {
     public logout(token: string){
         return $.ajax({
             url: `${this._base}/portal/user/logout`,
-            method: 'POST',
+            method: 'DELETE',
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
                 token
@@ -50,8 +50,8 @@ export class UserAPI {
 }
 
 export class User {
-    public Id: string;
-    public Nick: string;
+    public id: string;
+    public nick: string;
     public headUrl: string;
     public gender: string;
     public birthYear: string;
@@ -60,8 +60,8 @@ export class User {
 
     public constructor(src) {
         if (src) {
-            this.Id = src.Id;
-            this.Nick = src.Nick;
+            this.id = src.id;
+            this.nick = src.nick;
             this.headUrl = src.headUrl;
             this.gender = src.gender;
             this.birthYear = src.birthYear;
