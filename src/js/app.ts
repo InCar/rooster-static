@@ -88,6 +88,7 @@ export class App{
                 'about': App.AsyncComp("about/about"),
                 'org': App.AsyncComp("org/org"),
                 'org/{oid}/app': App.AsyncComp("org/app"),
+                'org/{oid}/app/{appId}': App.AsyncComp("org/appone"),
                 'demo': App.AsyncComp("demo/demo"),
                 '3rd': App.AsyncComp("3rd/3rd")
             },
@@ -120,10 +121,15 @@ export class App{
         this._vueRoot.$mount(this._rootElement);
 
         // switch components according location
+        var vthis = this;
         this.switch();
         window.onpopstate = (ev) => {
             this.switch();
         };
+        $(document).on("jump", function (e, url) {
+            history.pushState(null, null, url);
+            vthis.switch();
+        });
     };
 
     private switch() {
@@ -134,6 +140,7 @@ export class App{
         this._vueRoot['rest'] = matched.rest;
         this._vueRoot['args'] = matched.args;
     }
+
     private patchAnchor() {
         const xthis = this;
         const evClick: any = "click";
@@ -221,6 +228,10 @@ export class App{
 
     public static getToken(): string { return $.cookie("token"); }
 
+    public static jump(url: string) {
+        $(document).trigger("jump", url);
+    }
+
     public static bestMatch(path, keys) {
         var segPath = path.split("/");
         segPath.shift();
@@ -291,5 +302,48 @@ export class App{
                 obj.init(resolve, reject);
             });
         }
+    }
+}
+
+export class VuePage {
+    // 模板路径
+    protected _templatePath: string;
+    // 国际化支持
+    protected _enableI18N = true;
+    // VUE名称,派生类修改为自己的名称
+    protected name = "VuePage";
+    // VUE模板内容,变量名必须得是template,VUE规定的,不可以变更
+    protected template: string;
+    // VUE方法,变量名必须得是methods,VUE规定的不可以变更
+    protected methods: any = {};
+
+    public init(resolve, reject) {
+        // async loading
+        var loads = [];
+
+        // 如果模板路径有效,加载它,否则不加载
+        var tpl = this._templatePath;
+        if (tpl) {
+            loads.push(`text!${tpl}`);
+
+            // 如果开启i18n支持,加载对应的语言 filename.ext -> filename-zh.json
+            if (this._enableI18N) {
+                var jsonI18N = tpl.replace(/\.\w+$/i, `-${App.lang()}.json`)
+                loads.push(`text!${jsonI18N}`);
+            }
+            
+        }
+
+        requirejs(loads, (template, txt) => {
+            if (template) {
+                this.template = template;
+                if (txt) {
+                    const lang = JSON.parse(txt);
+                    this.methods['i18n'] = function (value) { return lang[value]; }
+                }
+            }
+
+            resolve(this);
+        });        
     }
 }

@@ -46,7 +46,7 @@ export class AppAPI {
     }
 
     // get app list
-    public getApps(token: String, oid: number) {
+    public getApps(token: string, oid: number) {
         return $.ajax({
             url: `${this._base}/portal/org/${oid}/app`,
             method: 'POST',
@@ -61,6 +61,26 @@ export class AppAPI {
                 app.name = d.name;
                 return app;
             });
+        });
+    }
+
+    // get app
+    public getApp(token: string, oid: number, appId: string) {
+        return $.ajax({
+            url: `${this._base}/portal/org/${oid}/app/${appId}`,
+            method: 'POST',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                token
+            })
+        }).then((data: any) => {
+            var app = new XApp();
+            app.appId = data.id;
+            app.name = data.name;
+            app.baseUrl = data.base;
+            app.ownerUserId = data.uid;
+            app.oid = data.oid;
+            return app;
         });
     }
 }

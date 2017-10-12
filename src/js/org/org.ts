@@ -1,4 +1,4 @@
-import * as Vue from "vue";
+﻿import * as Vue from "vue";
 import * as $ from "jquery";
 import { App } from "../app";
 import { OrgAPI } from "../api/orgAPI";
@@ -25,6 +25,7 @@ export = class OrgPage {
                 },
                 props: ['rest'],
                 mounted: function () {
+                    document.title = "英卡车云 - 组织";
                     var vthis = this;
                     var token = App.getToken();
                     apiOrg.getAllMyOrgs(token).then((data) => {
@@ -39,6 +40,7 @@ export = class OrgPage {
                         var token = App.getToken();
                         apiOrg.createOrg(token, this.newOrgName)
                             .then((o) => {
+                                vthis.newOrgName = "";
                                 vthis.listOrgs.push(o);
                                 vthis.listOrgs.sort((l, r) => { return l.id >= r.id });
                                 $(`#${dlg}`)['modal']('hide');
@@ -63,7 +65,7 @@ export = class OrgPage {
                             });
                     },
                     jump: function (oid: number, target: string) {
-                        document.location.href += `/${oid}/${target}`
+                        App.jump(`${document.location.href}/${oid}/${target}`);
                     }
                 }
             });
