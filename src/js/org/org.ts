@@ -2,15 +2,18 @@
 import * as $ from "jquery";
 import { App } from "../app";
 import { OrgAPI } from "../api/orgAPI";
+import { AppAPI } from "../api/appAPI";
 
 export = class OrgPage {
     private _apiOrg = new OrgAPI();
+    private _apiApp = new AppAPI();
 
     constructor() {
     }
 
     public init(resolve, reject) {
         var apiOrg = this._apiOrg;
+        var apiApp = this._apiApp;
 
         requirejs(['text!org/org.html'], (template) => {
             resolve({
@@ -30,7 +33,14 @@ export = class OrgPage {
                     var token = App.getToken();
                     apiOrg.getAllMyOrgs(token).then((data) => {
                         data.forEach((o) => {
+                            o["appCount"] = "?";
                             vthis.listOrgs.push(o);
+                            // 查询APP数目
+                            var fnCheckAppCount = async (oid:number)=>{
+                                var listApps = await apiApp.getApps(token, oid);
+                                o["appCount"] = listApps.length;
+                            };
+                            fnCheckAppCount(o.id);
                         });
                     });
                 },

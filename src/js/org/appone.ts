@@ -24,14 +24,13 @@ export = class AppOnePage extends VuePage {
         };
     };
 
-    private mounted = function () {
+    private mounted = async function() {
         // ²éÑ¯APPÏêÇé
         var apiApp: AppAPI = this.$options._apiApp;
 
         const token = App.getToken();
-        apiApp.getApp(token, this.args.oid, this.args.appId).then((app) => {
-            Vue.set(this, "app", app);
-        });
+        var app = await apiApp.getApp(token, this.args.oid, this.args.appId);
+        Vue.set(this, "app", app);
     };
 
     private computed = {
