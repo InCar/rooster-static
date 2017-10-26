@@ -1,13 +1,14 @@
 ﻿<div class="container-fluid">
     <ol class="breadcrumb">
         <li><a href="/">Home</a></li>
-        <li><a href="/org">{{i18n('org')}}</a></li>
+        <li><a href="/org">组织</a></li>
         <li><a v-bind:href="appPath">App</a></li>
-        <li class="active">{{app.name}}</li>
+        <li><a v-bind:href="appOnePath">{{app.name}}</a></li>
+        <li class="active">修改</li>
     </ol>
 
     <form class="form-horizontal">
-        <fieldset disabled>
+        <fieldset>
             <div class="form-group">
                 <label class="col-sm-2 control-label">名称</label>
                 <div class="col-sm-8">
@@ -38,8 +39,9 @@
             </div>
         </fieldset>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-8">
-                <a class="btn btn-primary btn-sm" :href="appModPath">修改</a>
+            <div class="col-sm-offset-2 col-sm-8 text-center">
+                <button type="button" class="btn btn-primary btn-sm" @click="save">确定</button>
+                <a class="btn btn-default btn-sm" :href="appOnePath">取消</a>
             </div>
         </div>
     </form>

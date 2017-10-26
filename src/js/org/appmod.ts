@@ -1,24 +1,24 @@
-import * as Vue from "vue";
+ï»¿import * as Vue from "vue";
 import * as $ from "jquery";
 import { App, VuePage } from "../app";
 import { AppAPI, XApp } from "../api/appAPI";
 import { ClassAPI } from "../api/classAPI";
 
-export = class AppOnePage extends VuePage {
+export = class AppModPage extends VuePage {
     // API
     private _apiApp = new AppAPI();
     private _apiCls = new ClassAPI();
 
-    // VUEÍâ²¿°ó¶¨ÌØÐÔ
+    // VUEå¤–éƒ¨ç»‘å®šç‰¹æ€§
     private props = ['args', 'rest'];
 
     constructor() {
         super();
 
-        // Éè¶¨
-        this.name = "AppOnePage";
-        this._templatePath = "org/appone.html";
-        this._enableI18N = true;
+        // è®¾å®š
+        this.name = "AppModPage";
+        this._templatePath = "org/appmod.html";
+        this._enableI18N = false;
     }
 
     private data = function () {
@@ -27,8 +27,8 @@ export = class AppOnePage extends VuePage {
         };
     };
 
-    private mounted = async function() {
-        // ²éÑ¯APPÏêÇé
+    private mounted = async function () {
+        // æŸ¥è¯¢APPè¯¦æƒ…
         var apiApp: AppAPI = this.$options._apiApp;
         var apiCls: ClassAPI = this.$options._apiCls;
 
@@ -39,6 +39,15 @@ export = class AppOnePage extends VuePage {
 
     private computed = {
         appPath: function () { return `/org/${this.args.oid}/app`; },
-        appModPath: function () { return `/org/${this.args.oid}/app/${this.args.appId}/mod` }
+        appOnePath: function () { return `/org/${this.args.oid}/app/${this.args.appId}` }
+    };
+
+    protected methods = {
+        save: async function () {
+            var apiApp: AppAPI = this.$options._apiApp;
+            var token = App.getToken();
+            await apiApp.saveApp(token, this.app);
+            App.jump(this.appOnePath);
+        }
     };
 }

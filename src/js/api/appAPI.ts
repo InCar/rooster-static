@@ -83,6 +83,22 @@ export class AppAPI {
             return app;
         });
     }
+
+    // save app
+    public async saveApp(token: string, app: XApp) {
+
+        console.info(JSON.stringify({ token, app }));
+
+        var ret = await $.ajax({
+            url: `${this._base}/portal/org/${app.oid}/app/mod`,
+            method: 'POST',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                token,
+                app
+            })
+        });
+    }
 }
 
 export class XAppNameOnly {

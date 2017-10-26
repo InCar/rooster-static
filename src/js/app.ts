@@ -89,6 +89,7 @@ export class App{
                 'org': App.AsyncComp("org/org"),
                 'org/{oid}/app': App.AsyncComp("org/app"),
                 'org/{oid}/app/{appId}': App.AsyncComp("org/appone"),
+                'org/{oid}/app/{appId}/mod': App.AsyncComp("org/appmod"),
                 'demo': App.AsyncComp("demo/demo"),
                 '3rd': App.AsyncComp("3rd/3rd")
             },
