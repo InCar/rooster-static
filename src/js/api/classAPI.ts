@@ -16,6 +16,15 @@ export class ClassAPI {
 
         return new TargetClassAndChildren(top);
     }
+
+    public async get(key: string) {
+        var cls = await $.ajax({
+            url: `${this._base}/portal/class/single/${key}`,
+            method: 'GET'
+        });
+
+        return new TargetClassAndChildren(cls);
+    }
 }
 
 export class TargetClass {

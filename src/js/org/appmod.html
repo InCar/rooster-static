@@ -29,12 +29,17 @@
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">功能</label>
-                <div class="col-sm-4">
-                    <ul class="list-group">
-                        <li class="list-group-item">HelloWorld<span class="badge badge-info" style="background-color:lightblue">SLIM</span></li>
-                        <li class="list-group-item">即时位置<span class="badge badge-primary">STD</span></li>
-                        <li class="list-group-item">历史轨迹<span class="badge badge-success">EXT</span></li>
-                    </ul>
+                <div class="col-sm-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading text-right" style="padding:4px">
+                                <button class="btn btn-sm btn-primary" type="button" data-toggle="modal" data-target="#dialog-add-feature">
+                                    <span class="glyphicon glyphicon-plus"></span>&nbsp;增加
+                                </button>
+                        </div>
+                        <div class="panel-body">
+                            Panel content
+                        </div>
+                    </div>
                 </div>
             </div>
         </fieldset>
@@ -45,4 +50,89 @@
             </div>
         </div>
     </form>
+
+    <div class="modal fade" id="dialog-add-feature" tabindex="-1" role="alertdialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增功能</h4>
+                </div>
+                <div class="modal-body">
+                    <ol class="breadcrumb" style="margin:2px">
+                        <template v-for="(cls, i) in feature.add.target">
+                            <li v-if="i < feature.add.target.length-1"><a href="javascript:void(0)" @click="onClickTargetParent(i)">{{cls.name}}</a></li>
+                            <li class="active" v-else>{{cls.name}}</li>
+                        </template>
+                    </ol>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="well" style="padding:8px;min-height:44px">
+                                <template v-if="subCls.length > 0">
+                                    <button type="button" v-for="cls in subCls" style="margin-right:8px;" @click="onClickTarget(cls)">{{cls.name}}</button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin:0">
+                        <div class="col-sm-12" style="border">
+                            <div class="panel panel-default" style="margin:0">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">功能 - 电动汽车</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table" style="margin:0">
+                                        <tr class="text-center" style="vertical-align:top">
+                                            <td>
+                                                <ul class="list-group text-left" style="overflow-y:auto;max-height:300px;">
+                                                    <li class="list-group-item">即时位置</li>
+                                                    <li class="list-group-item active">历史轨迹</li>
+                                                    <li class="list-group-item">电池组充放电</li>
+                                                    <li class="list-group-item">远程控制</li>
+                                                </ul>
+                                            </td>
+                                            <td width="32px">
+                                                <span class="glyphicon glyphicon-play"></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item active">精简</li>
+                                                    <li class="list-group-item">标准</li>
+                                                </ul>
+                                            </td>
+                                            <td width="32px">
+                                                <span class="glyphicon glyphicon-play"></span>
+                                            </td>
+                                            <td>
+                                                <ul class="list-group" style="overflow-y:auto;max-height:300px;">
+                                                    <li class="list-group-item">2.1.1</li>
+                                                    <li class="list-group-item active">2.1.0</li>
+                                                    <li class="list-group-item">1.6.0</li>
+                                                    <li class="list-group-item">1.5.0</li>
+                                                    <li class="list-group-item">1.4.2</li>
+                                                    <li class="list-group-item">1.4.0</li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" style="border-top:1px solid lightgray;padding:8px">
+                                                简述
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" @click="">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

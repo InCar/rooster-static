@@ -86,9 +86,6 @@ export class AppAPI {
 
     // save app
     public async saveApp(token: string, app: XApp) {
-
-        console.info(JSON.stringify({ token, app }));
-
         var ret = await $.ajax({
             url: `${this._base}/portal/org/${app.oid}/app/mod`,
             method: 'POST',
@@ -98,6 +95,7 @@ export class AppAPI {
                 app
             })
         });
+        return ret;
     }
 }
 
