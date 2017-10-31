@@ -25,16 +25,27 @@ export class ClassAPI {
 
         return new TargetClassAndChildren(cls);
     }
+
+    public async getRealms(key: string) {
+        var listRealms = await $.ajax({
+            url: `${this._base}/portal/realm/${key}`,
+            method: 'GET'
+        });
+
+        return listRealms;
+    }
 }
 
 export class TargetClass {
     public key: string;
     public name: string;
+    public dm: Array<string>;
 
     public constructor(src) {
         if (src) {
             this.key = src.key;
             this.name = src.chs;
+            this.dm = src.dm;
         }
     }
 }

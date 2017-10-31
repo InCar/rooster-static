@@ -26,7 +26,11 @@ export = class AppModPage extends VuePage {
             app: {},
             feature: {
                 add: {
-                    target: [] // 目标的层级结构
+                    target: [], // 目标的层级结构
+                    curDM: null,
+                    mapDM: { slim: {}, std: {}, ext: {} },
+                    curSTD: 0,
+                    curV: null
                 }
             }
         };
@@ -63,6 +67,17 @@ export = class AppModPage extends VuePage {
                 if (cur.children) return cur.children
                 else return []
             }
+        },
+        curCls: function () {
+            if (this.feature.add.target.length == 0) return {};
+            else {
+                var target = this.feature.add.target;
+                var cur = target[target.length - 1];
+                return cur;
+            }
+        },
+        realms: function () {
+            return this.curCls.dm;
         }
     };
 
@@ -82,10 +97,60 @@ export = class AppModPage extends VuePage {
 
                 if (!cls.children) cls.children = [];
             }
+
+            
             this.feature.add.target.push(cls);
+
+            // reset
+            this.feature.add.mapDM = { slim: {}, std: {}, ext: {} };
+            Vue.set(this.feature.add, "curDM", null);
+            Vue.set(this.feature.add, "curSTD", 0);
+            Vue.set(this.feature.add, "curV", null);
         },
         onClickTargetParent: function (i) {
             this.feature.add.target.splice(i + 1, this.feature.add.target.length - (i + 1));
+
+            // reset
+            this.feature.add.mapDM = { slim: {}, std: {}, ext: {} };
+            Vue.set(this.feature.add, "curDM", null);
+            Vue.set(this.feature.add, "curSTD", 0);
+            Vue.set(this.feature.add, "curV", null);
+        },
+        chooseDM: async function (dm) {
+            var apiCls: ClassAPI = this.$options._apiCls;
+
+            this.feature.add.curDM = dm;
+            var listDM: Array<any> = await apiCls.getRealms(dm);
+            // 重新组织一下 level
+            var mapDM = this.feature.add.mapDM;
+            listDM.forEach((d) => {
+                // group by level
+                var ver = `${d.ver.major}.${d.ver.minor}.${d.ver.fix}`;
+                if (d.level == 1) Vue.set(mapDM.slim, ver, d);
+                else if (d.level == 2) Vue.set(mapDM.std, ver, d);
+                else Vue.set(mapDM.ext, ver, d);
+            });
+
+            // 移掉空的集合
+            Object.keys(mapDM).forEach((k) => {
+                if (Object.keys(mapDM[k]).length == 0) {
+                    Vue.delete(mapDM, k);
+                }
+            });
+        },
+        stdName: function (s) {
+            if (s == "slim") return "精简";
+            else if (s == "std") return "标准";
+            else return "扩展";
+        },
+        chooseSTD: function (s) {
+            this.feature.add.curSTD = s;
+        },
+        chooseV: function (v) {
+            this.feature.add.curV = v;
+        },
+        addFeature: function (s, v) {
+            console.info(this.feature.add.mapDM[s][v]);
         }
     };
 }
