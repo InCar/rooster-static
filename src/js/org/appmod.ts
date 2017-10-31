@@ -25,6 +25,7 @@ export = class AppModPage extends VuePage {
         return {
             app: {},
             feature: {
+                change: {},
                 add: {
                     target: [], // 目标的层级结构
                     curDM: null,
@@ -86,6 +87,9 @@ export = class AppModPage extends VuePage {
             var apiApp: AppAPI = this.$options._apiApp;
             var token = App.getToken();
             await apiApp.saveApp(token, this.app);
+
+            //TODO: save....
+
             App.jump(this.appOnePath);
         },
         onClickTarget: async function (cls) {
@@ -143,14 +147,42 @@ export = class AppModPage extends VuePage {
             else if (s == "std") return "标准";
             else return "扩展";
         },
+        stdName2: function (s) {
+            if (s == "1") return "精简";
+            else if (s == "2") return "标准";
+            else return "扩展";
+        },
         chooseSTD: function (s) {
             this.feature.add.curSTD = s;
         },
         chooseV: function (v) {
             this.feature.add.curV = v;
         },
-        addFeature: function (s, v) {
-            console.info(this.feature.add.mapDM[s][v]);
+        addFeature: function (t, s, v) {
+            var feature = this.feature.add.mapDM[s][v];
+
+            if (!this.feature.change[t.key]) {
+                Vue.set(this.feature.change, t.key, { target: t, realm: {} });
+            }
+
+            if (!this.feature.change[t.key]["realm"][feature.id]) {
+                // 这表明是一个新加上去的功能
+                Vue.set(this.feature.change[t.key]["realm"], feature.id, feature);
+                Vue.set(this.feature.change[t.key]["realm"][feature.id], "status", "add");
+            }
+            else {
+                var old = this.feature.change[t.key]["realm"][feature.id];
+                if (old.level != feature.level
+                    || old.ver.major != feature.ver.major || old.ver.minor != feature.ver.minor || old.ver.fix != feature.ver.fix) {
+                    // TODO: 这表明功能的级别或版本号有变化，暂时还不支持这样的修改
+
+                }
+                else {
+                    // 没变化
+                }
+            }
+
+            $("#dialog-add-feature")['modal']("hide");
         }
     };
 }
