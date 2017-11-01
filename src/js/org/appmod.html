@@ -38,10 +38,10 @@
                         </div>
                         <div class="panel-body">
                             <ul class="list-group">
-                                <template v-for="v in feature.change">
+                                <template v-for="v in app.ability">
                                     <template v-for="(r, k) in v.realm">
                                         <li class="list-group-item">
-                                            {{v.target.name}} - {{k}}-{{stdName2(r.level)}}({{r.ver.major}}.{{r.ver.minor}}.{{r.ver.fix}})
+                                            {{v.target.name}} - {{k}}-{{r.level | lvl}}({{r.ver.major}}.{{r.ver.minor}}.{{r.ver.fix}})
                                             <a href="javascript:void(0)" class="btn btn-sm btn-danger" style="position:absolute;right:4px;top:5px" disabled>移除</a>
                                         </li>
                                     </template>
@@ -69,17 +69,17 @@
                 </div>
                 <div class="modal-body">
                     <ol class="breadcrumb" style="margin:2px">
-                        <template v-for="(cls, i) in feature.add.target">
-                            <li v-if="i < feature.add.target.length-1"><a href="javascript:void(0)" @click="onClickTargetParent(i)">{{cls.name}}</a></li>
+                        <template v-for="(cls, i) in listTarget">
+                            <li v-if="i < listTarget.length-1"><a href="javascript:void(0)" @click="chooseParent(i)">{{cls.name}}</a></li>
                             <li class="active" v-else><span class="label label-success">{{cls.name}}</span></li>
                         </template>
                     </ol>
                     <div class="row">
                         <div class="col-sm-12" style="padding:0 20px">
                             <div class="well" style="padding:8px;min-height:44px">
-                                更多子类型:
-                                <template v-if="subCls.length > 0">
-                                    <button type="button" v-for="cls in subCls" style="margin-right:8px;" @click="onClickTarget(cls)">{{cls.name}}</button>
+                                可选子类型:
+                                <template v-if="curT">
+                                    <button type="button" v-for="cls in curT.children" style="margin-right:8px;" @click="chooseChild(cls)">{{cls.name}}</button>
                                 </template>
                             </div>
                         </div>
@@ -87,19 +87,20 @@
 
                     <div class="row" style="margin:0">
                         <div class="col-sm-12" style="border">
-                            <div class="panel panel-default" style="margin:0">
+                            <div class="panel panel-default" style="margin:0" v-if="curT">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title"><span class="label label-success">{{curCls.name}}</span></h3>
+                                    <h3 class="panel-title"><span class="label label-success">{{curT.name}}</span></h3>
                                 </div>
                                 <div class="panel-body">
                                     <table class="table" style="margin:0">
                                         <tr class="text-center" style="vertical-align:top">
                                             <td>
                                                 <ul class="list-group text-left" style="overflow-y:auto;max-height:300px;">
-                                                    <template v-for="dm in realms">
-                                                        <li class="list-group-item" @click="chooseDM(dm)" v-bind:class="{active: feature.add.curDM == dm}" style="cursor:pointer">{{dm}}</li>
+                                                    <template v-for="dm in curT.dm">
+                                                        <li class="list-group-item" @click="chooseDM(dm)" v-bind:class="{active: curD.dm == dm}" style="cursor:pointer">{{dm}}</li>
                                                     </template>
-                                                    <template v-if="realms && realms.length == 0">
+                                                    <template v-if="curT.dm.length == 0">
+                                                        <!--没有可以显示的DM,展示一些示例好了-->
                                                         <li class="list-group-item">即时位置</li>
                                                         <li class="list-group-item">历史轨迹</li>
                                                         <li class="list-group-item">电池组充放电</li>
@@ -111,27 +112,27 @@
                                                 <span class="glyphicon glyphicon-play"></span>
                                             </td>
                                             <td class="text-center">
-                                                <ul class="list-group" v-if="feature.add.curDM">
-                                                    <template v-for="k in Object.keys(feature.add.mapDM)">
-                                                        <li class="list-group-item" @click="chooseSTD(k)" v-bind:class="{active: feature.add.curSTD == k}" style="cursor:pointer">{{stdName(k)}}</li>
+                                                <ul class="list-group" v-if="curD.dm">
+                                                    <template v-for="(v, level) in dm[curD.dm]">
+                                                        <li class="list-group-item" @click="chooseLvl(level)" v-bind:class="{active: curD.level == level}" style="cursor:pointer">{{ level | lvl }}</li>
                                                     </template>
                                                 </ul>
-                                                <ul class="list-group" v-if="!feature.add.curDM">
-                                                    <li class="list-group-item">精简</li>
-                                                    <li class="list-group-item">标准</li>
-                                                    <li class="list-group-item">扩展</li>
+                                                <ul class="list-group" v-if="!curD.dm">
+                                                    <li class="list-group-item">{{ 1 | lvl }}</li>
+                                                    <li class="list-group-item">{{ 2 | lvl }}</li>
+                                                    <li class="list-group-item">{{ 3 | lvl }}</li>
                                                 </ul>
                                             </td>
                                             <td class="play-mark">
                                                 <span class="glyphicon glyphicon-play"></span>
                                             </td>
                                             <td>
-                                                <ul class="list-group" style="overflow-y:auto;max-height:300px;" v-if="feature.add.curSTD">
-                                                    <template v-for="v in Object.keys(feature.add.mapDM[feature.add.curSTD])">
-                                                        <li class="list-group-item" style="cursor:pointer" @click="chooseV(v)" v-bind:class="{active: feature.add.curV == v}">{{v}}</li>
+                                                <ul class="list-group" style="overflow-y:auto;max-height:300px;" v-if="curD.level > 0">
+                                                    <template v-for="(v, k) in dm[curD.dm][curD.level]">
+                                                        <li class="list-group-item" style="cursor:pointer" @click="chooseV(k)" v-bind:class="{active: curD.v == k}">{{ k }}</li>
                                                     </template>
                                                 </ul>
-                                                <ul class="list-group" v-if="!feature.add.curSTD">
+                                                <ul class="list-group" v-if="curD.level == 0">
                                                     <li class="list-group-item">2.1.0</li>
                                                     <li class="list-group-item">1.1.0</li>
                                                     <li class="list-group-item">1.0.0</li>
@@ -140,10 +141,12 @@
                                         
                                         <tr>
                                             <td colspan="5" style="border-top:1px solid lightgray;padding:8px">
-                                                功能:{{ feature.add.curDM }}<br />
-                                                <span v-if="feature.add.curSTD && feature.add.curV">
-                                                    {{feature.add.mapDM[feature.add.curSTD][feature.add.curV].chs}}
-                                                </span>
+                                                功能:{{ dmNow.id }}<br />
+                                                说明:{{dmNow.chs}}<br />
+                                                <hr />
+                                                <template v-for="func in dmNow.funcs">
+                                                    {{func.url}}: {{func.chs}}
+                                                </template>
                                             </td>
                                         </tr>
                                     </table>
@@ -156,7 +159,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" @click="addFeature(curCls, feature.add.curSTD, feature.add.curV)" v-bind:disabled="!feature.add.curV">OK</button>
+                    <button type="button" class="btn btn-success" @click="addAbility('dialog-add-feature', curT, dmNow)" v-bind:disabled="!curD.v">OK</button>
                 </div>
             </div>
         </div>

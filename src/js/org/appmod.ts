@@ -24,16 +24,11 @@ export = class AppModPage extends VuePage {
     private data = function () {
         return {
             app: {},
-            feature: {
-                change: {},
-                add: {
-                    target: [], // 目标的层级结构
-                    curDM: null,
-                    mapDM: { slim: {}, std: {}, ext: {} },
-                    curSTD: 0,
-                    curV: null
-                }
-            }
+            target: {}, // 目标对象层级结构
+            listTarget: [], // 父级呈现
+            dm: {},     // 数据领域层级结构
+            curT: null,
+            curD: { dm: null, level: 0, v: null }
         };
     };
 
@@ -46,13 +41,15 @@ export = class AppModPage extends VuePage {
         var app = await apiApp.getApp(token, this.args.oid, this.args.appId);
         Vue.set(this, "app", app);
 
-        // 监控弹出框
+        // 弹出
         var vthis = this;
         $("#dialog-add-feature").on("show.bs.modal", async () => {
-            if (vthis.feature.add.target.length == 0) {
-                // 加载顶层分类
+            // 初始化顶层目标对象
+            if (!Object.keys(vthis.target).length) {
                 var top = await apiCls.getTop();
-                vthis.feature.add.target.push(top)
+                Vue.set(vthis, "target", top);
+                Vue.set(vthis, "curT", top);
+                vthis.listTarget.push(top);
             }
         });
     };
@@ -60,25 +57,29 @@ export = class AppModPage extends VuePage {
     private computed = {
         appPath: function () { return `/org/${this.args.oid}/app`; },
         appOnePath: function () { return `/org/${this.args.oid}/app/${this.args.appId}` },
-        subCls: function () {
-            if (this.feature.add.target.length == 0) return [];
-            else {
-                var target = this.feature.add.target;
-                var cur = target[target.length - 1];
-                if (cur.children) return cur.children
-                else return []
-            }
-        },
-        curCls: function () {
-            if (this.feature.add.target.length == 0) return {};
-            else {
-                var target = this.feature.add.target;
-                var cur = target[target.length - 1];
-                return cur;
-            }
-        },
-        realms: function () {
-            return this.curCls.dm;
+        dmNow: function () {
+            if (this.curD.v != null) return this.dm[this.curD.dm][this.curD.level][this.curD.v];
+            else return {};
+        }
+    };
+
+    private watch = {
+        curT: function (value) {
+            var vthis = this;
+            var apiCls: ClassAPI = this.$options._apiCls;
+            // 加载所有还没有加载详情的dm
+            value.dm.forEach(async (dm: string) => {
+                if (!vthis.dm[dm]) {
+                    var listDM = await apiCls.getRealms(dm);
+                    // 按level重新组织一下
+                    var mapDM = {};
+                    listDM.forEach((d) => {
+                        if (!mapDM[d.level]) mapDM[d.level] = {};
+                        mapDM[d.level][d.ver.version()] = d;
+                    });
+                    Vue.set(vthis.dm, dm, mapDM);
+                }
+            });
         }
     };
 
@@ -92,97 +93,72 @@ export = class AppModPage extends VuePage {
 
             App.jump(this.appOnePath);
         },
-        onClickTarget: async function (cls) {
+        chooseChild: async function (cls) {
             var apiCls: ClassAPI = this.$options._apiCls;
-            // 选择了一个子项
+
+            if (cls.children == undefined) Vue.set(cls, "children", null);
+
+            this.listTarget.push(cls);
+            this.curT = cls;
+            this.resetDM();
+
+            // 延迟加载子项
             if (!cls.children) {
                 var clsEx = await apiCls.get(cls.key);
+                if (!clsEx.children) clsEx.children = [];
                 cls.children = clsEx.children;
-
-                if (!cls.children) cls.children = [];
             }
-
-            
-            this.feature.add.target.push(cls);
-
-            // reset
-            this.feature.add.mapDM = { slim: {}, std: {}, ext: {} };
-            Vue.set(this.feature.add, "curDM", null);
-            Vue.set(this.feature.add, "curSTD", 0);
-            Vue.set(this.feature.add, "curV", null);
         },
-        onClickTargetParent: function (i) {
-            this.feature.add.target.splice(i + 1, this.feature.add.target.length - (i + 1));
+        chooseParent: function (i) {
+            this.listTarget.splice(i + 1, this.listTarget.length);
+            this.curT = this.listTarget[i];
 
             // reset
-            this.feature.add.mapDM = { slim: {}, std: {}, ext: {} };
-            Vue.set(this.feature.add, "curDM", null);
-            Vue.set(this.feature.add, "curSTD", 0);
-            Vue.set(this.feature.add, "curV", null);
+            this.resetDM();
         },
-        chooseDM: async function (dm) {
-            var apiCls: ClassAPI = this.$options._apiCls;
-
-            this.feature.add.curDM = dm;
-            var listDM: Array<any> = await apiCls.getRealms(dm);
-            // 重新组织一下 level
-            var mapDM = this.feature.add.mapDM;
-            listDM.forEach((d) => {
-                // group by level
-                var ver = `${d.ver.major}.${d.ver.minor}.${d.ver.fix}`;
-                if (d.level == 1) Vue.set(mapDM.slim, ver, d);
-                else if (d.level == 2) Vue.set(mapDM.std, ver, d);
-                else Vue.set(mapDM.ext, ver, d);
-            });
-
-            // 移掉空的集合
-            Object.keys(mapDM).forEach((k) => {
-                if (Object.keys(mapDM[k]).length == 0) {
-                    Vue.delete(mapDM, k);
-                }
-            });
+        resetDM: function () {
+            this.curD.v = null;
+            this.curD.level = 0;
+            this.curD.dm = null;
         },
-        stdName: function (s) {
-            if (s == "slim") return "精简";
-            else if (s == "std") return "标准";
-            else return "扩展";
+        chooseDM: function (dm) {
+            this.curD.dm = dm;
         },
-        stdName2: function (s) {
-            if (s == "1") return "精简";
-            else if (s == "2") return "标准";
-            else return "扩展";
-        },
-        chooseSTD: function (s) {
-            this.feature.add.curSTD = s;
+        chooseLvl: function (level) {
+            this.curD.level = level;
         },
         chooseV: function (v) {
-            this.feature.add.curV = v;
+            this.curD.v = v;
         },
-        addFeature: function (t, s, v) {
-            var feature = this.feature.add.mapDM[s][v];
-
-            if (!this.feature.change[t.key]) {
-                Vue.set(this.feature.change, t.key, { target: t, realm: {} });
+        addAbility: function (dlg, target, dm) {
+            // 对于应用而言,1个对象的1个领域只能支持1套(1个级别的1个版本)功能
+            if (!this.app.ability[target.key]) {
+                Vue.set(this.app.ability, target.key, { target, realm: {} });
             }
 
-            if (!this.feature.change[t.key]["realm"][feature.id]) {
+            if (!this.app.ability[target.key].realm[dm.id]) {
                 // 这表明是一个新加上去的功能
-                Vue.set(this.feature.change[t.key]["realm"], feature.id, feature);
-                Vue.set(this.feature.change[t.key]["realm"][feature.id], "status", "add");
+                Vue.set(this.app.ability[target.key].realm, dm.id, dm);
+                Vue.set(this.app.ability[target.key].realm[dm.id], "status", "add");
             }
             else {
-                var old = this.feature.change[t.key]["realm"][feature.id];
-                if (old.level != feature.level
-                    || old.ver.major != feature.ver.major || old.ver.minor != feature.ver.minor || old.ver.fix != feature.ver.fix) {
-                    // TODO: 这表明功能的级别或版本号有变化，暂时还不支持这样的修改
-
-                }
-                else {
-                    // 没变化
-                }
+                // 表明有变化,暂时不支持
             }
 
-            $("#dialog-add-feature")['modal']("hide");
+            $(`#${dlg}`)['modal']("hide");
+            this.resetDM();
+        }
+    };
+
+    private filters = {
+        lvl: function (value) {
+            switch (Number(value)) {
+                case 1: return "精简";
+                case 2: return "标准";
+                case 0: return "NA";
+                default:
+                    return "扩展";
+            }
         }
     };
 }

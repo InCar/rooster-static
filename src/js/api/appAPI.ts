@@ -104,6 +104,7 @@ export class XAppNameOnly {
     public appId: string;
     public ownerUserId: string;
     public oid: number;
+    public ability: any = {};
 
     public constructor(src?: XAppNameOnly) {
         if (src) {

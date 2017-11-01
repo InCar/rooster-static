@@ -27,12 +27,14 @@ export class ClassAPI {
     }
 
     public async getRealms(key: string) {
-        var listRealms = await $.ajax({
+        var listRealms:Array<any> = await $.ajax({
             url: `${this._base}/portal/realm/${key}`,
             method: 'GET'
         });
 
-        return listRealms;
+        return listRealms.map((d) => {
+            return new Realm(d);
+        })
     }
 }
 
@@ -58,6 +60,56 @@ export class TargetClassAndChildren extends TargetClass {
 
         if (src) {
             this.children = src.children.map((t) => { return new TargetClass(t); });
+        }
+    }
+}
+
+export class Realm {
+    public id: string;
+    public chs: string;
+    public level: number;
+    public ver: RealmVer;
+    public funcs: Array<RealmFunc>;
+
+    public constructor(src?:any) {
+        if (src) {
+            this.id = src.id;
+            this.chs = src.chs;
+            this.level = Number(src.level);
+            this.ver = new RealmVer(src.ver);
+            this.funcs = src.funcs.map((d) => { return new RealmFunc(d); });
+        }
+    }
+}
+
+export class RealmVer {
+    public major: number;
+    public minor: number;
+    public fix: number;
+
+    public constructor(src?:any) {
+        if (src) {
+            this.major = src.major;
+            this.minor = src.minor;
+            this.fix = src.fix;
+        }
+    }
+
+    public version() {
+        return `${this.major}.${this.minor}.${this.fix}`;
+    }
+}
+
+export class RealmFunc {
+    public url: string;
+    public chs: string;
+    public httpMethod: string;
+
+    public constructor(src?: any) {
+        if (src) {
+            this.url = src.url;
+            this.chs = src.chs;
+            this.httpMethod = src.httpMethod;
         }
     }
 }
