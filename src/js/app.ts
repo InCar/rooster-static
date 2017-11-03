@@ -45,7 +45,8 @@ export class App{
             rest: "",
             args: {},
             qq: window['settings'].qq,
-            user: {}
+            user: {},
+            checking: true
         };
 
         // boostrap的navbar在小屏上的点击菜单后,直接隐匿菜单效果
@@ -103,7 +104,9 @@ export class App{
                 // check cookie token for user
                 var token = $.cookie("token");
                 if (token) {
+                    vthis.checking = true;
                     apiUser.findUserByToken(token).then((user) => {
+                        vthis.checking = false;
                         if (user) {
                             // token有效
                             vthis.user = Object.assign({}, vthis.user, user);
@@ -112,9 +115,14 @@ export class App{
                             // token无效
                             $.removeCookie("token", { path: '/' })
                         }
+                    }, (ex) => {
+                        vthis.checking = false;
+                        console.error(ex);
                     })
                 }
-                
+                else {
+                    vthis.checking = false;
+                }
             }
         });
 

@@ -85,11 +85,30 @@ export = class AppModPage extends VuePage {
 
     protected methods = {
         save: async function () {
-            var apiApp: AppAPI = this.$options._apiApp;
-            var token = App.getToken();
+            const apiApp: AppAPI = this.$options._apiApp;
+            const token = App.getToken();
+
+            // 保存基本信息
             await apiApp.saveApp(token, this.app);
 
-            //TODO: save....
+            // 功能
+            const app = this.app;
+            Object.keys(app.ability).forEach((target) => {
+                Object.keys(app.ability[target].realm).forEach(async (realm) => {
+                    const feature = app.ability[target].realm[realm];
+                    if (feature.status == "add") {
+                        const ability = {
+                            target,
+                            realm,
+                            level: feature.level,
+                            version: feature.ver
+                        };
+                        console.info(ability);
+                        await apiApp.addAbility(token, this.app.oid, this.app.appId, ability);
+                    }
+                });
+            });
+            
 
             App.jump(this.appOnePath);
         },

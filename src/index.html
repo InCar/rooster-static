@@ -40,8 +40,10 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li v-if="isLogin" class="hidden-xs"><img v-bind:src="user.headUrl" style="padding:5px 0" v-bind:title="user.nick"/></li>
-                        <li v-if="!isLogin"><a v-bind:href="qq"><img src="//qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/Connect_logo_7.png" /></a></li>
+                        <template v-if="!checking">
+                            <li v-if="isLogin" class="hidden-xs"><img v-bind:src="user.headUrl" style="padding:5px 0" v-bind:title="user.nick" /></li>
+                            <li v-if="!isLogin"><a v-bind:href="qq"><img src="//qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/Connect_logo_7.png" /></a></li>
+                        </template>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-globe"></span> <span v-text="lang">中文</span> <span class="caret"></span></a>
                             <ul class="dropdown-menu">

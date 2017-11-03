@@ -97,6 +97,21 @@ export class AppAPI {
         });
         return ret;
     }
+
+    // add ability to an app
+    public async addAbility(token: string, oid: number, appId: string, ability: ArgAbility) {
+        return $.ajax({
+            url: `${this._base}/portal/org/${oid}/app/${appId}/ability`,
+            method: 'POST',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                token,
+                ability
+            })
+        }).then((app: any) => {
+            return app;
+        });
+    }
 }
 
 export class XAppNameOnly {
@@ -125,4 +140,17 @@ export class XApp extends XAppNameOnly {
             this.baseUrl = src.baseUrl;
         }
     }
+}
+
+export class ArgAbility {
+    public target: string;
+    public realm: string;
+    public level: number;
+    public version: RealmVer
+}
+
+export class RealmVer {
+    public major: number;
+    public minor: number;
+    public fix: number; 
 }
