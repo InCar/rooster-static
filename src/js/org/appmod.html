@@ -38,10 +38,10 @@
                         </div>
                         <div class="panel-body">
                             <ul class="list-group">
-                                <template v-for="v in app.ability">
-                                    <template v-for="(r, k) in v.realm">
+                                <template v-for="(v, target) in app.abi">
+                                    <template v-for="(rlm, realm) in v">
                                         <li class="list-group-item">
-                                            {{v.target.name}} - {{k}}-{{r.level | lvl}}({{r.ver.major}}.{{r.ver.minor}}.{{r.ver.fix}})
+                                            {{target}} - {{realm}}-{{rlm.level | lvl}}({{rlm.ver.major}}.{{rlm.ver.minor}}.{{rlm.ver.fix}})
                                             <a href="javascript:void(0)" class="btn btn-sm btn-danger" style="position:absolute;right:4px;top:5px" disabled>移除</a>
                                         </li>
                                     </template>

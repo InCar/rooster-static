@@ -30,9 +30,14 @@
                 <label class="col-sm-2 control-label">功能</label>
                 <div class="col-sm-4">
                     <ul class="list-group">
-                        <li class="list-group-item">SandBox - HelloWorld<span class="badge badge-info" style="background-color:lightblue">SLIM</span></li>
-                        <li class="list-group-item">汽车 - 即时位置<span class="badge badge-primary">STD</span></li>
-                        <li class="list-group-item">汽车 - 历史轨迹<span class="badge badge-success">EXT</span></li>
+                        <template v-for="(v, target) in app.abi">
+                            <li class="list-group-item" v-for="(rlm, realm) in v">{{target}} - {{realm}}<span class="badge">{{rlm.level | lvl}}</span></li>
+                        </template>
+                        
+                        <template v-if="!app.abi || Object.keys(app.abi).length == 0">
+                            <li class="list-group-item">汽车 - 即时位置<span class="badge badge-primary">示例</span></li>
+                            <li class="list-group-item">汽车 - 历史轨迹<span class="badge badge-success">示例</span></li>
+                        </template>
                     </ul>
                 </div>
             </div>

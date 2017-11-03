@@ -93,9 +93,9 @@ export = class AppModPage extends VuePage {
 
             // 功能
             const app = this.app;
-            Object.keys(app.ability).forEach((target) => {
-                Object.keys(app.ability[target].realm).forEach(async (realm) => {
-                    const feature = app.ability[target].realm[realm];
+            Object.keys(app.abi).forEach((target) => {
+                Object.keys(app.abi[target]).forEach(async (realm) => {
+                    const feature = app.abi[target][realm];
                     if (feature.status == "add") {
                         const ability = {
                             target,
@@ -103,7 +103,6 @@ export = class AppModPage extends VuePage {
                             level: feature.level,
                             version: feature.ver
                         };
-                        console.info(ability);
                         await apiApp.addAbility(token, this.app.oid, this.app.appId, ability);
                     }
                 });
@@ -151,14 +150,14 @@ export = class AppModPage extends VuePage {
         },
         addAbility: function (dlg, target, dm) {
             // 对于应用而言,1个对象的1个领域只能支持1套(1个级别的1个版本)功能
-            if (!this.app.ability[target.key]) {
-                Vue.set(this.app.ability, target.key, { target, realm: {} });
+            if (!this.app.abi[target.key]) {
+                Vue.set(this.app.abi, target.key, {});
             }
 
-            if (!this.app.ability[target.key].realm[dm.id]) {
+            if (!this.app.abi[target.key][dm.id]) {
                 // 这表明是一个新加上去的功能
-                Vue.set(this.app.ability[target.key].realm, dm.id, dm);
-                Vue.set(this.app.ability[target.key].realm[dm.id], "status", "add");
+                Vue.set(this.app.abi[target.key], dm.id, dm);
+                Vue.set(this.app.abi[target.key][dm.id], "status", "add");
             }
             else {
                 // 表明有变化,暂时不支持

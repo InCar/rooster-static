@@ -56,10 +56,7 @@ export class AppAPI {
             })
         }).then((data: Array<any>) => {
             return data.map((d) => {
-                var app = new XAppNameOnly()
-                app.appId = d.id;
-                app.name = d.name;
-                return app;
+                return new XAppNameOnly(d);
             });
         });
     }
@@ -74,13 +71,7 @@ export class AppAPI {
                 token
             })
         }).then((data: any) => {
-            var app = new XApp();
-            app.appId = data.id;
-            app.name = data.name;
-            app.baseUrl = data.base;
-            app.ownerUserId = data.uid;
-            app.oid = data.oid;
-            return app;
+            return new XAppPlusAbility(data);
         });
     }
 
@@ -121,11 +112,11 @@ export class XAppNameOnly {
     public oid: number;
     public ability: any = {};
 
-    public constructor(src?: XAppNameOnly) {
+    public constructor(src?:any) {
         if (src) {
             this.name = src.name;
-            this.appId = src.appId;
-            this.ownerUserId = src.ownerUserId
+            this.appId = src.id;
+            this.ownerUserId = src.uid
             this.oid = src.oid;
         }
     }
@@ -134,10 +125,21 @@ export class XAppNameOnly {
 export class XApp extends XAppNameOnly {
     public baseUrl: string;
 
-    public constructor(src?: XApp) {
-        super(src)
+    public constructor(src?:any) {
+        super(src);
         if (src) {
-            this.baseUrl = src.baseUrl;
+            this.baseUrl = src.base;
+        }
+    }
+}
+
+export class XAppPlusAbility extends XApp {
+    public abi: any = {};
+
+    public constructor(src?:any) {
+        super(src);
+        if (src) {
+            this.abi = src.abi;
         }
     }
 }

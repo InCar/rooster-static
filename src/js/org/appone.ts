@@ -1,4 +1,4 @@
-import * as Vue from "vue";
+ï»¿import * as Vue from "vue";
 import * as $ from "jquery";
 import { App, VuePage } from "../app";
 import { AppAPI, XApp } from "../api/appAPI";
@@ -9,13 +9,13 @@ export = class AppOnePage extends VuePage {
     private _apiApp = new AppAPI();
     private _apiCls = new ClassAPI();
 
-    // VUEÍâ²¿°ó¶¨ÌØÐÔ
+    // VUEå¤–éƒ¨ç»‘å®šç‰¹æ€§
     private props = ['args', 'rest'];
 
     constructor() {
         super();
 
-        // Éè¶¨
+        // è®¾å®š
         this.name = "AppOnePage";
         this._templatePath = "org/appone.html";
         this._enableI18N = true;
@@ -28,7 +28,7 @@ export = class AppOnePage extends VuePage {
     };
 
     private mounted = async function() {
-        // ²éÑ¯APPÏêÇé
+        // æŸ¥è¯¢APPè¯¦æƒ…
         var apiApp: AppAPI = this.$options._apiApp;
         var apiCls: ClassAPI = this.$options._apiCls;
 
@@ -40,5 +40,17 @@ export = class AppOnePage extends VuePage {
     private computed = {
         appPath: function () { return `/org/${this.args.oid}/app`; },
         appModPath: function () { return `/org/${this.args.oid}/app/${this.args.appId}/mod` }
+    };
+
+    private filters = {
+        lvl: function (value) {
+            switch (Number(value)) {
+                case 1: return "ç²¾ç®€";
+                case 2: return "æ ‡å‡†";
+                case 0: return "NA";
+                default:
+                    return "æ‰©å±•";
+            }
+        }
     };
 }
