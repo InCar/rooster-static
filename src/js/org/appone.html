@@ -28,17 +28,48 @@
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">功能</label>
-                <div class="col-sm-4">
-                    <ul class="list-group">
-                        <template v-for="(v, target) in app.abi">
-                            <li class="list-group-item" v-for="(rlm, realm) in v">{{target}} - {{realm}}<span class="badge">{{rlm.level | lvl}}</span></li>
-                        </template>
-                        
-                        <template v-if="!app.abi || Object.keys(app.abi).length == 0">
-                            <li class="list-group-item">汽车 - 即时位置<span class="badge badge-primary">示例</span></li>
-                            <li class="list-group-item">汽车 - 历史轨迹<span class="badge badge-success">示例</span></li>
-                        </template>
-                    </ul>
+                <div class="col-sm-8">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>类型</th>
+                                        <th>功能集</th>
+                                        <th class="text-center">级别</th>
+                                        <th class="text-center">版本</th>
+                                        <th>前缀</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(v, target) in app.abi">
+                                        <template v-for="(rlm, realm) in v">
+                                            <td>{{target}}</td>
+                                            <td>{{realm}}</td>
+                                            <td class="text-center">{{rlm.level | lvl}}</td>
+                                            <td class="text-center">{{rlm.ver.major}}.{{rlm.ver.minor}}.{{rlm.ver.fix}}</td>
+                                            <td>{{rlm.prefix}}</td>
+                                        </template>
+                                    </tr>
+
+                                    <tr v-if="!app.abi || Object.keys(app.abi).length == 0">
+                                        <td>汽车</td>
+                                        <td>即时位置</td>
+                                        <td class="text-center">标准</td>
+                                        <td class="text-center">1.2.3</td>
+                                        <td>示例</td>
+                                    </tr>
+                                    <tr v-if="!app.abi || Object.keys(app.abi).length == 0">
+                                        <td>汽车</td>
+                                        <td>历史轨迹</td>
+                                        <td class="text-center">标准</td>
+                                        <td class="text-center">1.2.3</td>
+                                        <td>示例</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </fieldset>

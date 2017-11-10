@@ -28,7 +28,8 @@ export = class AppModPage extends VuePage {
             listTarget: [], // 父级呈现
             dm: {},     // 数据领域层级结构
             curT: null,
-            curD: { dm: null, level: 0, v: null }
+            curD: { dm: null, level: 0, v: null },
+            prefix: "f0"
         };
     };
 
@@ -101,7 +102,8 @@ export = class AppModPage extends VuePage {
                             target,
                             realm,
                             level: feature.level,
-                            version: feature.ver
+                            version: feature.ver,
+                            prefix: feature.prefix
                         };
                         await apiApp.addAbility(token, this.app.oid, this.app.appId, ability);
                     }
@@ -138,6 +140,7 @@ export = class AppModPage extends VuePage {
             this.curD.v = null;
             this.curD.level = 0;
             this.curD.dm = null;
+            this.prefix = "f0";
         },
         chooseDM: function (dm) {
             this.curD.dm = dm;
@@ -157,6 +160,7 @@ export = class AppModPage extends VuePage {
             if (!this.app.abi[target.key][dm.id]) {
                 // 这表明是一个新加上去的功能
                 Vue.set(this.app.abi[target.key], dm.id, dm);
+                Vue.set(this.app.abi[target.key][dm.id], "prefix", this.prefix);
                 Vue.set(this.app.abi[target.key][dm.id], "status", "add");
             }
             else {

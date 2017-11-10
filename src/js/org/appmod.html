@@ -32,21 +32,37 @@
                 <div class="col-sm-8">
                     <div class="panel panel-default">
                         <div class="panel-heading text-right" style="padding:4px">
-                                <button class="btn btn-sm btn-primary" type="button" data-toggle="modal" data-target="#dialog-add-feature">
-                                    <span class="glyphicon glyphicon-pencil"></span>&nbsp;增加
-                                </button>
+                            <button class="btn btn-sm btn-primary" type="button" data-toggle="modal" data-target="#dialog-add-feature">
+                                <span class="glyphicon glyphicon-pencil"></span>&nbsp;增加
+                            </button>
                         </div>
                         <div class="panel-body">
-                            <ul class="list-group">
-                                <template v-for="(v, target) in app.abi">
-                                    <template v-for="(rlm, realm) in v">
-                                        <li class="list-group-item">
-                                            {{target}} - {{realm}}-{{rlm.level | lvl}}({{rlm.ver.major}}.{{rlm.ver.minor}}.{{rlm.ver.fix}})
-                                            <a href="javascript:void(0)" class="btn btn-sm btn-danger" style="position:absolute;right:4px;top:5px" disabled>移除</a>
-                                        </li>
-                                    </template>
-                                </template>
-                            </ul>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>类型</th>
+                                        <th>功能集</th>
+                                        <th class="text-center">级别</th>
+                                        <th class="text-center">版本</th>
+                                        <th>前缀</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(v, target) in app.abi">
+                                        <template v-for="(rlm, realm) in v">
+                                            <td>{{target}}</td>
+                                            <td>{{realm}}</td>
+                                            <td class="text-center">{{rlm.level | lvl}}</td>
+                                            <td class="text-center">{{rlm.ver.major}}.{{rlm.ver.minor}}.{{rlm.ver.fix}}</td>
+                                            <td>{{rlm.prefix}}</td>
+                                            <td class="text-right" style="padding:2px 8px">
+                                                <a href="javascript:void(0)" class="btn btn-sm btn-danger" style="" disabled><span class="glyphicon glyphicon-remove"></span>&nbsp;移除</a>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -140,11 +156,12 @@
                                                     <li class="list-group-item">1.0.0</li>
                                                 </ul>
                                         </tr>
-                                        
+
                                         <tr>
                                             <td colspan="5" style="border-top:1px solid lightgray;padding:8px">
                                                 功能:{{ dmNow.id }}<br />
                                                 说明:{{dmNow.chs}}<br />
+                                                前缀:<input type="text" v-model="prefix" style="text-align:center"/>
                                                 <hr />
                                                 <template v-for="func in dmNow.funcs">
                                                     {{func.url}}: {{func.chs}}
@@ -152,10 +169,10 @@
                                             </td>
                                         </tr>
                                     </table>
-                                    
+
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>

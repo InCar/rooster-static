@@ -149,6 +149,7 @@ export class ArgAbility {
     public realm: string;
     public level: number;
     public version: RealmVer
+    public prefix: string;
 }
 
 export class RealmVer {
