@@ -60,7 +60,7 @@ export class App{
             data,
             methods: {
                 setLang: (lang) => {
-                    $.cookie("lang", lang, { path: '/' });
+                    $.cookie("lang", lang, { path: '/', expires: 365 });
                     window.location.reload();
                 },
                 onLogin: function(user){
